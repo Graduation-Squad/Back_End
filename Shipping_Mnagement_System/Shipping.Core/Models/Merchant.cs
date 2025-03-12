@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Shipping.Core.Models
 {
-    public class Merchant
+    public class Merchant : BaseModel
     {
-        public int Id { get; set; }
         public string StoreName { get; set; }
         public string StoreAddress { get; set; }
 

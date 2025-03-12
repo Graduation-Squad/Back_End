@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Shipping.Core.Models
 {
-    public class DeliveryMan
+    public class DeliveryMan : BaseModel
     {
-        public int Id { get; set; }
         public string VehicleNumber { get; set; }
         public string LicenseNumber { get; set; }
 

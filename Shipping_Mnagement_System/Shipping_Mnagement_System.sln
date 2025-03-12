@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping_BackEnd", "Shipping_BackEnd\Shipping_BackEnd.csproj", "{583FF47B-81A5-4B7F-A7BD-E91711E8ABD9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping_APIs", "Shipping_BackEnd\Shipping_APIs.csproj", "{583FF47B-81A5-4B7F-A7BD-E91711E8ABD9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shipping.Core", "Shipping.Core\Shipping.Core.csproj", "{604CBC99-A1E3-4C40-BBB3-271188B43D59}"
 EndProject
@@ -36,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C8F9FF6-D6DB-4E0D-99AB-07EA1DF90F57}
 	EndGlobalSection
 EndGlobal

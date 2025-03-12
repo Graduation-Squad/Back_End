@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Shipping.Core.Models
 {
-    public class Employee
+    public class Employee : BaseModel
     {
-        public int Id { get; set; }
         public string EmployeeCode { get; set; }
         public string Department { get; set; }
 

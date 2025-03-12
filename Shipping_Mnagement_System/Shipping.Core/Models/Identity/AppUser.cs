@@ -12,11 +12,6 @@ namespace Shipping.Core.Models.Identity
         // Custom properties
         public string FullName { get; set; }
         public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-
-        //navigation properties
-        public Employee Employee { get; set; }
-        public Merchant Merchant { get; set; }
-        public DeliveryMan DeliveryMan { get; set; }
+        public string PhoneNumber { get; set; }        
     }
 }
