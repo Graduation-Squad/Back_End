@@ -1,8 +1,11 @@
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using Shipping.Core.Models.Identity;
 using Shipping.Repository.Data;
+using Shipping.Repository.Data.Identity;
 
 namespace Shipping_BackEnd
 {
@@ -16,26 +19,35 @@ namespace Shipping_BackEnd
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShippingSys.APIs", Version = "v1" });
+            });
+
             builder.Services.AddDbContext<ShippingContext>(Options=>
             {
                 Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             }
             );
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShippingSys.APIs", Version = "v1" });
-            });
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<ShippingContext>();
+
             #endregion
+
+            
 
             var app = builder.Build();
 
-            var Scope = app.Services.CreateScope();
+            using var Scope = app.Services.CreateScope();
             var Services = Scope.ServiceProvider;
             var context = Services.GetRequiredService<ShippingContext>();
+            var roleManager = Services.GetRequiredService<RoleManager<IdentityRole>>();
             var LoggerFactory = Services.GetRequiredService<ILoggerFactory>();
             try
             {
                 await context.Database.MigrateAsync();
+                await SeedRoles.Initialize(roleManager);
             }
             catch (Exception e)
             {
