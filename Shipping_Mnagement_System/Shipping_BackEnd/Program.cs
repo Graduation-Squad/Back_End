@@ -7,7 +7,7 @@ using Shipping.Core.Models.Identity;
 using Shipping.Repository.Data;
 using Shipping.Repository.Data.Identity;
 
-namespace Shipping_BackEnd
+namespace Shipping_APIs
 {
     public class Program
     {
