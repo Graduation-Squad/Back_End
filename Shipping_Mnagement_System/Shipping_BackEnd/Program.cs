@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using Shipping.Core.Models.Identity;
 using Shipping.Repository.Data;
 using Shipping.Repository.Data.Identity;
+using Shipping.Service;
 
 namespace Shipping_APIs
 {
@@ -32,6 +33,8 @@ namespace Shipping_APIs
 
             builder.Services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<ShippingContext>();
+
+            builder.Services.AddScoped<UserService, UserService>();
 
             #endregion
 

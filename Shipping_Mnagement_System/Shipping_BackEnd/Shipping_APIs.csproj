@@ -21,10 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shipping.Repository\Shipping.Repository.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Shipping.Service\Shipping.Service.csproj" />
   </ItemGroup>
 
 </Project>
