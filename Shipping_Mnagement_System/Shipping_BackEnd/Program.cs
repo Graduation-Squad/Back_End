@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Shipping.Core.Models.Identity;
+using Shipping.Core.Repositories;
+using Shipping.Repository;
 using Shipping.Repository.Data;
 using Shipping.Repository.Data.Identity;
 using Shipping.Service;
@@ -35,10 +37,12 @@ namespace Shipping_APIs
                 .AddEntityFrameworkStores<ShippingContext>();
 
             builder.Services.AddScoped<UserService, UserService>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             #endregion
 
-            
+
 
             var app = builder.Build();
 
