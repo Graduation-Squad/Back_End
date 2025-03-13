@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
@@ -9,6 +10,8 @@ using Shipping.Repository;
 using Shipping.Repository.Data;
 using Shipping.Repository.Data.Identity;
 using Shipping.Service;
+using Shipping_APIs.Errors;
+using Shipping_APIs.Middlewares;
 
 namespace Shipping_APIs
 {
@@ -37,9 +40,38 @@ namespace Shipping_APIs
                 .AddEntityFrameworkStores<ShippingContext>();
 
             builder.Services.AddScoped<UserService, UserService>();
+
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+
+            //builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = (actionContext) =>
+                {
+
+                    /*
+                     ModelState = {
+                        {"Name", ModelStateEntry { Errors = ["The Name field is required."] } },
+                        { "Age", ModelStateEntry { Errors = ["The field Age must be between 18 and 60."] } }
+                     }
+                     */
+                    var errors = actionContext.ModelState.Where(p => p.Value.Errors.Count() > 0)
+                    .SelectMany(p => p.Value.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToArray();
+
+                    var validationErrorResponse = new ApiValidationErrorResponse()
+                    {
+                        Errors = errors
+                    };
+
+                    return new BadRequestObjectResult(validationErrorResponse);
+                };
+            });
 
 
             #endregion
@@ -63,20 +95,27 @@ namespace Shipping_APIs
                 var logger = LoggerFactory.CreateLogger<Program>();
                 logger.LogError(e, "migration error");
             }
+
+
             #region Configure-Configure the HTTP request pipeline
+            app.UseMiddleware<ExceptionHandlerMiddleware>();
+
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Talabat.APIs v1"));
-            }
+            }   
 
-            app.UseHttpsRedirection();
+            app.UseStatusCodePagesWithRedirects("/errors/{0}"); //kestrel server who will send the status code 
+            //It only activates when a request reaches the end of the pipeline without a response
 
-            app.UseAuthorization();
+            app.UseHttpsRedirection(); //forces https
+
+            app.UseAuthorization(); //Ensures that only authorized users can access protected endpoints.
 
 
-            app.MapControllers();
+            app.MapControllers(); //This registers controllers and tries to match requests to controller actions.
             #endregion
 
             app.Run();
