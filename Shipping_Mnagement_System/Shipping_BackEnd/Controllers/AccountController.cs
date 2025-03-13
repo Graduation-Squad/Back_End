@@ -39,5 +39,37 @@ namespace Shipping_APIs.Controllers
                 return BadRequest(new ApiErrorResponse(400, ex.Message));
             }
         }
+
+        [HttpPost("register/DeliveryMan")]
+        public async Task<ActionResult> RegisterDeliveryMan(DeliveryManRegistrationModel model)
+        {
+            try
+            {
+                var deliveryman = await _userService.RegisterDeliveryManAsync(model);
+                if (deliveryman == null)
+                    return BadRequest(new ApiErrorResponse(400, "failed to add deliveryman"));
+                return Ok(_mapper.Map<DeliveryMan, DeliveryManToReturn>(deliveryman));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
+        }
+
+        [HttpPost("register/Merchant")]
+        public async Task<ActionResult> RegisterMerchant(MerchantRegistrationModel model)
+        {
+            try
+            {
+                var merchant = await _userService.RegisterMerchantAsync(model);
+                if (merchant == null)
+                    return BadRequest(new ApiErrorResponse(400, "failed to add merchant"));
+                return Ok(_mapper.Map<Merchant, MerchantToReturn>(merchant));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
+        }
     }
 }

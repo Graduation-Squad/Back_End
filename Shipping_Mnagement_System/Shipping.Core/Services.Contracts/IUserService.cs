@@ -11,8 +11,8 @@ namespace Shipping.Core.Services.Contracts
 {
     public interface IUserService
     {
-        public Task<Employee?> RegisterEmployeeAsync(EmployeeRegistrationModel model);
-        public Task<Merchant?> RegisterMerchantAsync(MerchantRegistrationModel model);
-        public Task<DeliveryMan?> RegisterDeliveryManAsync(DeliveryManRegistrationModel model);
+        public Task<Employee> RegisterEmployeeAsync(EmployeeRegistrationModel model);
+        public Task<Merchant> RegisterMerchantAsync(MerchantRegistrationModel model);
+        public Task<DeliveryMan> RegisterDeliveryManAsync(DeliveryManRegistrationModel model);
     }
 }
