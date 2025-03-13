@@ -101,15 +101,15 @@ namespace Shipping_APIs
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Talabat.APIs v1"));
             }   
 
-            app.UseStatusCodePagesWithRedirects("/errors/{0}"); //kestrel server who will send the code status
+            app.UseStatusCodePagesWithRedirects("/errors/{0}"); //kestrel server who will send the status code 
             //It only activates when a request reaches the end of the pipeline without a response
 
             app.UseHttpsRedirection(); //forces https
 
-            app.UseAuthorization();
+            app.UseAuthorization(); //Ensures that only authorized users can access protected endpoints.
 
 
-            app.MapControllers();
+            app.MapControllers(); //This registers controllers and tries to match requests to controller actions.
             #endregion
 
             app.Run();
