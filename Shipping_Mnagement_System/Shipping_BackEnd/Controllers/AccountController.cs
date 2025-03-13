@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Core;
 using Shipping.Core.Models;
 using Shipping.Models;
 using Shipping.Service;
@@ -24,12 +25,19 @@ namespace Shipping_APIs.Controllers
         [HttpPost("register/Employee")]
         public async Task<ActionResult> RegisterEmployee(EmployeeRegistrationModel model)
         {
-            var employee = await _userService.RegisterEmployeeAsync(model);
+            try
+            {
+                var employee = await _userService.RegisterEmployeeAsync(model);
 
-            if(employee == null)
-                return BadRequest(new ApiErrorResponse(400, "failed to add employee"));
+                if (employee == null)
+                    return BadRequest(new ApiErrorResponse(400, "failed to add employee"));
 
-            return Ok(_mapper.Map<Employee, EmployeeToReturn>(employee));
+                return Ok(_mapper.Map<Employee, EmployeeToReturn>(employee));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿    using Microsoft.AspNetCore.Identity;
+using Shipping.Core;
 using Shipping.Core.Models;
 using Shipping.Core.Models.Identity;
 using Shipping.Core.Repositories;
@@ -45,9 +46,7 @@ namespace Shipping.Service
             var result = await _userManager.CreateAsync(appUser, model.Password);
 
             if (!result.Succeeded)
-            {
-                throw new ValidationException(result.Errors.Select(x => x.Description).Aggregate((i, j) => i + ", " + j));
-            }
+                throw new Exception(result.Errors.FirstOrDefault().Description);
 
             //assign role
             await _userManager.AddToRoleAsync(appUser, "Employee");
