@@ -39,6 +39,8 @@ namespace Shipping_APIs
             builder.Services.AddScoped<UserService, UserService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+
 
             #endregion
 
