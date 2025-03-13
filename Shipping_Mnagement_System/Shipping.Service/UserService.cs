@@ -1,30 +1,40 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Shipping.Core.Models;
 using Shipping.Core.Models.Identity;
+using Shipping.Core.Repositories;
+using Shipping.Core.Services.Contracts;
 using Shipping.Models;
 using Shipping.Repository.Data;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Shipping.Service
 {
-    public class UserService
+    public class UserService : IUserService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
-        private readonly ShippingContext _context;
 
-        public UserService(UserManager<AppUser> userManager, ShippingContext context)
+        public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager)
         {
+            _unitOfWork = unitOfWork;
             _userManager = userManager;
-            _context = context;
         }
 
-        public async Task<IdentityResult> RegisterEmployeeAsync(EmployeeRegistrationModel model)
+        public Task<DeliveryMan> RegisterDeliveryManAsync(DeliveryManRegistrationModel model)
         {
-            var user = new AppUser
+            throw new NotImplementedException();
+        }
+
+        public async Task<Employee?> RegisterEmployeeAsync(EmployeeRegistrationModel model)
+        {
+
+            //create appuser and assign role
+            var appUser = new AppUser
             {
                 Email = model.Email,
                 UserName = model.Email.Split('@')[0],
@@ -32,27 +42,36 @@ namespace Shipping.Service
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address
             };
+            var result = await _userManager.CreateAsync(appUser, model.Password);
 
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if(result.Succeeded)
+            if (!result.Succeeded)
             {
-                //assign role
-                await _userManager.AddToRoleAsync(user, "Employee");
-
-                //create employee record
-                var employee = new Employee
-                {
-                    AppUserId = user.Id,
-                    EmployeeCode = model.EmployeeCode,
-                    Department = model.Department
-                };
-
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                throw new ValidationException(result.Errors.Select(x => x.Description).Aggregate((i, j) => i + ", " + j));
             }
 
-            return result;
+            //assign role
+            await _userManager.AddToRoleAsync(appUser, "Employee");
+
+            //create employee record
+            var employee = new Employee
+            {
+                AppUserId = appUser.Id,
+                EmployeeCode = model.EmployeeCode,
+                Department = model.Department
+            };
+            await _unitOfWork.Repository<Employee>().AddAsync(employee);
+
+            //save changes
+            await _unitOfWork.CompleteAsync();
+
+            return employee;
+      
+            
         }
 
+        public Task<Merchant> RegisterMerchantAsync(MerchantRegistrationModel model)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

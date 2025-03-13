@@ -11,6 +11,7 @@ using Shipping.Repository.Data;
 using Shipping.Repository.Data.Identity;
 using Shipping.Service;
 using Shipping_APIs.Errors;
+using Shipping_APIs.MappingProfiles;
 using Shipping_APIs.Middlewares;
 
 namespace Shipping_APIs
@@ -39,14 +40,13 @@ namespace Shipping_APIs
             builder.Services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<ShippingContext>();
 
-            builder.Services.AddScoped<UserService, UserService>();
-
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
 
-            //builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            //builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfiles.MappingProfiles()));
+
+            builder.Services.AddScoped<UserService, UserService>();
 
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {

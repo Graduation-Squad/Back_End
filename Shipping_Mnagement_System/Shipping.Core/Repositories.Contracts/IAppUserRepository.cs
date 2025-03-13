@@ -11,7 +11,8 @@ namespace Shipping.Core.Repositories
     {
         Task<AppUser?> GetByEmailAsync(string email);
         Task<IEnumerable<AppUser>> GetAllUsersAsync();
-        Task AddUserAsync(AppUser user);
+        Task AddUserAsync(AppUser user, string password);
+        Task AssignRoleAsync(AppUser user, string role);
     }
 
 

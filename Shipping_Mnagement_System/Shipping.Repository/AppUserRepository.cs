@@ -30,10 +30,16 @@ namespace Shipping.Repository
             return await _userManager.Users.ToListAsync();
         }
 
-        public async Task AddUserAsync(AppUser user)
+        public async Task AddUserAsync(AppUser user, string password)
         {
-            await _userManager.CreateAsync(user);
+            await _userManager.CreateAsync(user, password);
         }
+
+        public async Task AssignRoleAsync(AppUser user, string role)
+        {
+            await _userManager.AddToRoleAsync(user, role);
+        }
+
     }
 
 
