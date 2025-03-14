@@ -37,9 +37,13 @@ namespace Shipping_APIs.Controllers
         public ActionResult GetServerErrorResponse()
         {
             var product = _shippingContext.Employees.Find(1000);
+            if (product == null)
+                return StatusCode(500, new ApiErrorResponse(500, "Internal Server Error"));
+
             var productToReturn = product.ToString();
             return Ok(productToReturn);
         }
+
 
         [HttpGet("ValidationError/{id}")]
         public ActionResult GetValidationErrorResponse(int id)

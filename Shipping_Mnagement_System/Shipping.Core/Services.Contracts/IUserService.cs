@@ -14,5 +14,6 @@ namespace Shipping.Core.Services.Contracts
         public Task<Employee> RegisterEmployeeAsync(EmployeeRegistrationModel model);
         public Task<Merchant> RegisterMerchantAsync(MerchantRegistrationModel model);
         public Task<DeliveryMan> RegisterDeliveryManAsync(DeliveryManRegistrationModel model);
+        Task<string> LoginAsync(LoginModel model);
     }
 }

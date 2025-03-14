@@ -1,8 +1,8 @@
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shipping.Core.Models.Identity;
 using Shipping.Core.Repositories;
@@ -13,6 +13,7 @@ using Shipping.Service;
 using Shipping_APIs.Errors;
 using Shipping_APIs.MappingProfiles;
 using Shipping_APIs.Middlewares;
+using System.Text;
 
 namespace Shipping_APIs
 {
@@ -22,69 +23,121 @@ namespace Shipping_APIs
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #region Configure Service Add services to the container
+            #region Configure Services
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+            // ? Swagger Configuration
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShippingSys.APIs", Version = "v1" });
+
+                #region Enable JWT Authentication
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter 'Bearer' [space] and then your token."
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                  {
+                      new OpenApiSecurityScheme
+                      {
+                         Reference = new OpenApiReference
+                         {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                         }
+                      },
+                      new string[] {}
+                  }
+                });
+                #endregion
             });
 
-            builder.Services.AddDbContext<ShippingContext>(Options=>
-            {
-                Options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            }
-            );
 
+            // ? Database Configuration
+            builder.Services.AddDbContext<ShippingContext>(options =>
+            {
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            // ? Identity Configuration
             builder.Services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<ShippingContext>();
 
+            // ? Dependency Injection
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
-
-            builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfiles.MappingProfiles()));
-
             builder.Services.AddScoped<UserService, UserService>();
 
+            // ? AutoMapper Configuration
+            builder.Services.AddAutoMapper(config => config.AddProfile(new MappingProfiles.MappingProfiles()));
+
+            // ? Custom API Error Handling
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
-                options.InvalidModelStateResponseFactory = (actionContext) =>
+                options.InvalidModelStateResponseFactory = actionContext =>
                 {
+                    var errors = actionContext.ModelState
+                        .Where(p => p.Value.Errors.Count > 0)
+                        .SelectMany(p => p.Value.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToArray();
 
-                    /*
-                     ModelState = {
-                        {"Name", ModelStateEntry { Errors = ["The Name field is required."] } },
-                        { "Age", ModelStateEntry { Errors = ["The field Age must be between 18 and 60."] } }
-                     }
-                     */
-                    var errors = actionContext.ModelState.Where(p => p.Value.Errors.Count() > 0)
-                    .SelectMany(p => p.Value.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToArray();
-
-                    var validationErrorResponse = new ApiValidationErrorResponse()
-                    {
-                        Errors = errors
-                    };
-
+                    var validationErrorResponse = new ApiValidationErrorResponse { Errors = errors };
                     return new BadRequestObjectResult(validationErrorResponse);
                 };
             });
-
-
             #endregion
 
+            #region JWT Authentication
+            var jwtKey = builder.Configuration["JwtSettings:Key"];
+            if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 16)
+            {
+                throw new ArgumentNullException(nameof(jwtKey), "JWT Key is missing or too short in configuration.");
+            }
 
+            Console.WriteLine($"Loaded JWT Key: {jwtKey}"); // Debugging
+            var key = Encoding.UTF8.GetBytes(jwtKey);
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                    ValidateLifetime = true
+                };
+            });
+            #endregion
 
             var app = builder.Build();
 
-            using var Scope = app.Services.CreateScope();
-            var Services = Scope.ServiceProvider;
-            var context = Services.GetRequiredService<ShippingContext>();
-            var roleManager = Services.GetRequiredService<RoleManager<IdentityRole>>();
-            var LoggerFactory = Services.GetRequiredService<ILoggerFactory>();
+            #region Database Migration & Seeding
+            using var scope = app.Services.CreateScope();
+            var services = scope.ServiceProvider;
+            var context = services.GetRequiredService<ShippingContext>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
             try
             {
                 await context.Database.MigrateAsync();
@@ -92,30 +145,27 @@ namespace Shipping_APIs
             }
             catch (Exception e)
             {
-                var logger = LoggerFactory.CreateLogger<Program>();
-                logger.LogError(e, "migration error");
+                var logger = loggerFactory.CreateLogger<Program>();
+                logger.LogError(e, "Migration error occurred.");
             }
+            #endregion
 
-
-            #region Configure-Configure the HTTP request pipeline
+            #region Configure Middleware Pipeline
             app.UseMiddleware<ExceptionHandlerMiddleware>();
 
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Talabat.APIs v1"));
-            }   
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShippingSys.APIs v1"));
+            }
 
-            app.UseStatusCodePagesWithRedirects("/errors/{0}"); //kestrel server who will send the status code 
-            //It only activates when a request reaches the end of the pipeline without a response
+            app.UseStatusCodePagesWithRedirects("/errors/{0}"); 
 
-            app.UseHttpsRedirection(); //forces https
-
-            app.UseAuthorization(); //Ensures that only authorized users can access protected endpoints.
-
-
-            app.MapControllers(); //This registers controllers and tries to match requests to controller actions.
+            app.UseHttpsRedirection(); 
+            app.UseAuthentication();  
+            app.UseAuthorization();   
+            app.MapControllers(); 
             #endregion
 
             app.Run();
