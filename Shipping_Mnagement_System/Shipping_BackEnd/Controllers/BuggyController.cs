@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shipping.Repository.Data;
 using Shipping_APIs.Errors;
 
@@ -18,6 +19,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("NotFound")]
+        [Authorize(Roles = "Employee")]
         public ActionResult GetNotFoundResponse()
         {
             var product = _shippingContext.Employees.Find(100);

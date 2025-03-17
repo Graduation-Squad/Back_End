@@ -13,7 +13,7 @@ namespace Shipping_APIs.Controllers
     {
         public IActionResult Error(int statusCode)
         {
-            return NotFound(new ApiErrorResponse(statusCode, "Not Found EndPoint"));
+            return NotFound(new ApiErrorResponse(statusCode));
         }
     }
 }

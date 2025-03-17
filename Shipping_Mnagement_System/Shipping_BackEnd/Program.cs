@@ -161,6 +161,7 @@ namespace Shipping_APIs
             }
 
             app.UseStatusCodePagesWithRedirects("/errors/{0}"); 
+            //app.UseStatusCodePages();
 
             app.UseHttpsRedirection(); 
             app.UseAuthentication();  
