@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shipping.Core.Models.Identity;
 using Shipping.Core.Repositories;
+using Shipping.Core.Services.Contracts;
 using Shipping.Repository;
 using Shipping.Repository.Data;
 using Shipping.Repository.Data.Identity;
@@ -76,6 +77,8 @@ namespace Shipping_APIs
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
             builder.Services.AddScoped<UserService, UserService>();
+            builder.Services.AddScoped<IPermissionService, PermissionService>();
+            builder.Services.AddScoped<IUserGroupService, UserGroupService>();
 
             // ? AutoMapper Configuration
             builder.Services.AddAutoMapper(config => config.AddProfile(new MappingProfiles.MappingProfiles()));

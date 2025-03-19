@@ -24,8 +24,6 @@ namespace Shipping_APIs.Controllers
         {
             if (true)
                 return NotFound(new ApiErrorResponse(404));
-
-            return Ok();
         }
 
         [HttpGet("BadRequest")]
@@ -34,16 +32,16 @@ namespace Shipping_APIs.Controllers
             return BadRequest(new ApiErrorResponse(400));
         }
 
-        //[HttpGet("ServerError")]
-        //public ActionResult GetServerErrorResponse()
-        //{
-        //    var product = _shippingContext.Employees.Find(1000);
-        //    if (product == null)
-        //        return StatusCode(500, new ApiErrorResponse(500, "Internal Server Error"));
+        [HttpGet("ServerError")]
+        public ActionResult GetServerErrorResponse()
+        {
+            var userGroup = _shippingContext.UserGroups.Find(1000);
+            if (userGroup == null)
+                return StatusCode(500, new ApiErrorResponse(500, "Internal Server Error"));
 
-        //    var productToReturn = product.ToString();
-        //    return Ok(productToReturn);
-        //}
+            var productToReturn = userGroup.ToString();
+            return Ok(productToReturn);
+        }
 
 
         [HttpGet("ValidationError/{id}")]
