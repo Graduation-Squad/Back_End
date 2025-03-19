@@ -155,7 +155,7 @@ namespace Shipping.Repository.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Shipping.Core.Models.DeliveryMan", b =>
+            modelBuilder.Entity("Shipping.Core.DomainModels.Permission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -163,27 +163,24 @@ namespace Shipping.Repository.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LicenseNumber")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("VehicleNumber")
+                    b.Property<string>("Module")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
-
-                    b.ToTable("DeliveryMen");
+                    b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("Shipping.Core.Models.Employee", b =>
+            modelBuilder.Entity("Shipping.Core.DomainModels.UserGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -191,24 +188,34 @@ namespace Shipping.Repository.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Department")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("EmployeeCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
+                    b.ToTable("UserGroups");
+                });
 
-                    b.ToTable("Employees");
+            modelBuilder.Entity("Shipping.Core.DomainModels.UserGroupPermission", b =>
+                {
+                    b.Property<int>("UserGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserGroupId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("UserGroupPermissions");
                 });
 
             modelBuilder.Entity("Shipping.Core.Models.Identity.AppUser", b =>
@@ -219,13 +226,12 @@ namespace Shipping.Repository.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -236,7 +242,11 @@ namespace Shipping.Repository.Data.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -256,7 +266,6 @@ namespace Shipping.Repository.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
@@ -268,9 +277,19 @@ namespace Shipping.Repository.Data.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserGroupId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -282,35 +301,9 @@ namespace Shipping.Repository.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("UserGroupId");
+
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Shipping.Core.Models.Merchant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("StoreAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StoreName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
-
-                    b.ToTable("Merchants");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -364,37 +357,45 @@ namespace Shipping.Repository.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Shipping.Core.Models.DeliveryMan", b =>
+            modelBuilder.Entity("Shipping.Core.DomainModels.UserGroupPermission", b =>
                 {
-                    b.HasOne("Shipping.Core.Models.Identity.AppUser", "AppUser")
-                        .WithOne()
-                        .HasForeignKey("Shipping.Core.Models.DeliveryMan", "AppUserId")
+                    b.HasOne("Shipping.Core.DomainModels.Permission", "Permission")
+                        .WithMany("UserGroupPermissions")
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AppUser");
+                    b.HasOne("Shipping.Core.DomainModels.UserGroup", "UserGroup")
+                        .WithMany("UserGroupPermissions")
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("UserGroup");
                 });
 
-            modelBuilder.Entity("Shipping.Core.Models.Employee", b =>
+            modelBuilder.Entity("Shipping.Core.Models.Identity.AppUser", b =>
                 {
-                    b.HasOne("Shipping.Core.Models.Identity.AppUser", "AppUser")
-                        .WithOne()
-                        .HasForeignKey("Shipping.Core.Models.Employee", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Shipping.Core.DomainModels.UserGroup", "UserGroup")
+                        .WithMany("Users")
+                        .HasForeignKey("UserGroupId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("AppUser");
+                    b.Navigation("UserGroup");
                 });
 
-            modelBuilder.Entity("Shipping.Core.Models.Merchant", b =>
+            modelBuilder.Entity("Shipping.Core.DomainModels.Permission", b =>
                 {
-                    b.HasOne("Shipping.Core.Models.Identity.AppUser", "AppUser")
-                        .WithOne()
-                        .HasForeignKey("Shipping.Core.Models.Merchant", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("UserGroupPermissions");
+                });
 
-                    b.Navigation("AppUser");
+            modelBuilder.Entity("Shipping.Core.DomainModels.UserGroup", b =>
+                {
+                    b.Navigation("UserGroupPermissions");
+
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

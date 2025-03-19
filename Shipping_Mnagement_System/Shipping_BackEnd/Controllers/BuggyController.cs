@@ -22,11 +22,10 @@ namespace Shipping_APIs.Controllers
         [Authorize(Roles = "Employee")]
         public ActionResult GetNotFoundResponse()
         {
-            var product = _shippingContext.Employees.Find(100);
-            if (product is null)
+            if (true)
                 return NotFound(new ApiErrorResponse(404));
 
-            return Ok(product);
+            return Ok();
         }
 
         [HttpGet("BadRequest")]
@@ -35,16 +34,16 @@ namespace Shipping_APIs.Controllers
             return BadRequest(new ApiErrorResponse(400));
         }
 
-        [HttpGet("ServerError")]
-        public ActionResult GetServerErrorResponse()
-        {
-            var product = _shippingContext.Employees.Find(1000);
-            if (product == null)
-                return StatusCode(500, new ApiErrorResponse(500, "Internal Server Error"));
+        //[HttpGet("ServerError")]
+        //public ActionResult GetServerErrorResponse()
+        //{
+        //    var product = _shippingContext.Employees.Find(1000);
+        //    if (product == null)
+        //        return StatusCode(500, new ApiErrorResponse(500, "Internal Server Error"));
 
-            var productToReturn = product.ToString();
-            return Ok(productToReturn);
-        }
+        //    var productToReturn = product.ToString();
+        //    return Ok(productToReturn);
+        //}
 
 
         [HttpGet("ValidationError/{id}")]

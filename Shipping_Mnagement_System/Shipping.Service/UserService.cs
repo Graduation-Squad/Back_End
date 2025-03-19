@@ -133,14 +133,18 @@
 //}
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Shipping.Core.DomainModels;
+using Shipping.Core.Enums;
 using Shipping.Core.Models;
 using Shipping.Core.Models.Identity;
 using Shipping.Core.Repositories;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -162,111 +166,52 @@ namespace Shipping.Service
             _configuration = configuration;
         }
 
-        // Register DeliveryMan
-        public async Task<DeliveryMan> RegisterDeliveryManAsync(DeliveryManRegistrationModel model)
+        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
         {
-            //create appuser
-            var appUser = new AppUser
+            if (!Enum.TryParse(request.UserType, out UserType userType))
             {
-                Email = model.Email,
-                UserName = model.Email.Split('@')[0],
-                FullName = model.FullName,
-                PhoneNumber = model.PhoneNumber,
-                Address = model.Address
-            };
-            var result = await _userManager.CreateAsync(appUser, model.Password);
+                throw new Exception("Invalid UserType.");
+            }
 
-            //assign role
-            if (!result.Succeeded)
-                throw new Exception(result.Errors.FirstOrDefault()?.Description);
-
-            //create deliveryman record
-            var deliveryman = new DeliveryMan
+            if (userType == UserType.Employee)
             {
-                AppUserId = appUser.Id,
-                VehicleNumber = model.VehicleNumber,
-                LicenseNumber = model.LicenseNumber
-            };
-            await _unitOfWork.Repository<DeliveryMan>().AddAsync(deliveryman);
+                var userGroup = await _unitOfWork.Repository<UserGroup>().GetByIdAsync(request.UserGroupId.Value);
+                if (userGroup == null)
+                {
+                    throw new Exception("UserGroup not found.");
+                }
+            }
 
-            //save changes
-            await _unitOfWork.CompleteAsync();
-
-            //return deliveryman
-            return deliveryman;
-        }
-
-        // Register Employee
-        public async Task<Employee> RegisterEmployeeAsync(EmployeeRegistrationModel model)
-        {
-            //create appuser and assign role
-            var appUser = new AppUser
+            if (await _userManager.FindByEmailAsync(request.Email) != null)
             {
-                Email = model.Email,
-                UserName = model.Email.Split('@')[0],
-                FullName = model.FullName,
-                PhoneNumber = model.PhoneNumber,
-                Address = model.Address
+                throw new Exception("Email is already registered.");
+            }
+
+
+            var user = new AppUser
+            {
+                Email = request.Email,
+                UserName = request.Email.Split("@")[0],
+                FullName = request.FullName,
+                PhoneNumber = request.PhoneNumber,
+                UserType = Enum.Parse<UserType>(request.UserType),
+                UserGroupId = (Enum.Parse<UserType>(request.UserType) == UserType.Employee) ? request.UserGroupId : null    
             };
-            var result = await _userManager.CreateAsync(appUser, model.Password);
+
+            var result =await  _userManager.CreateAsync(user, request.Password);
 
             if (!result.Succeeded)
-                throw new Exception(result.Errors.FirstOrDefault()?.Description);
+                throw new Exception(result.Errors.FirstOrDefault().Description);
 
-            //assign role
-            await _userManager.AddToRoleAsync(appUser, "Employee");
-
-            //create employee record
-            var employee = new Employee
+            return new RegisterResponse
             {
-                AppUserId = appUser.Id,
-                EmployeeCode = model.EmployeeCode,
-                Department = model.Department
+                UserId = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                Username = user.UserName,
+                UserType = user.UserType.ToString()
             };
-            await _unitOfWork.Repository<Employee>().AddAsync(employee);
-
-            //save changes
-            await _unitOfWork.CompleteAsync();
-
-            return employee;
         }
-        // Register Merchant
-        public async Task<Merchant> RegisterMerchantAsync(MerchantRegistrationModel model)
-        {
-            //create appuser 
-            var appUser = new AppUser
-            {
-                Email = model.Email,
-                UserName = model.Email.Split('@')[0],
-                FullName = model.FullName,
-                PhoneNumber = model.PhoneNumber,
-                Address = model.Address
-            };
-            var result = await _userManager.CreateAsync(appUser, model.Password);
-            if (!result.Succeeded)
-                throw new Exception(result.Errors.FirstOrDefault()?.Description);
-
-            //assign role
-            await _userManager.AddToRoleAsync(appUser, "Merchant");
-
-            //create merchant record
-            var merchant = new Merchant
-            {
-                AppUserId = appUser.Id,
-                StoreName = model.StoreName,
-                StoreAddress = model.StoreAddress
-            };
-            await _unitOfWork.Repository<Merchant>().AddAsync(merchant);
-
-            //save changes
-            await _unitOfWork.CompleteAsync();
-
-            //return merchant   
-            return merchant;
-        }
-
-
-        // 🔹 User Login with JWT
         public async Task<string> LoginAsync(LoginModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
@@ -309,5 +254,6 @@ namespace Shipping.Service
 
             return tokenHandler.WriteToken(token);
         }
+
     }
 }

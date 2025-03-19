@@ -135,13 +135,11 @@ namespace Shipping_APIs
             using var scope = app.Services.CreateScope();
             var services = scope.ServiceProvider;
             var context = services.GetRequiredService<ShippingContext>();
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             try
             {
                 await context.Database.MigrateAsync();
-                await SeedRoles.Initialize(roleManager);
             }
             catch (Exception e)
             {

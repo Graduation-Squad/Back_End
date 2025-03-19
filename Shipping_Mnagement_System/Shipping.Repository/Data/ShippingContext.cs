@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Shipping.Core.DomainModels;
 using Shipping.Core.Models;
 using Shipping.Core.Models.Identity;
 using System;
@@ -24,8 +25,9 @@ namespace Shipping.Repository.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        public DbSet<Employee> Employees { get; set; }
-        public DbSet<Merchant> Merchants { get; set; }
-        public DbSet<DeliveryMan> DeliveryMen { get; set; }
+        public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<UserGroupPermission> UserGroupPermissions { get; set; }
+       
     }
 }
