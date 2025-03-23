@@ -20,5 +20,7 @@ namespace Shipping.Core.Models.Identity
         // Relationships
         public int? UserGroupId { get; set; }
         public UserGroup? UserGroup { get; set; }
+        public ICollection<UserBranch> UserBranches { get; set; } = new List<UserBranch>();
+
     }
 }
