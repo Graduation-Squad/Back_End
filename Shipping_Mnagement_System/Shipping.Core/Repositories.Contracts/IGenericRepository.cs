@@ -1,4 +1,5 @@
 ﻿using Shipping.Core.Models;
+using Shipping.Core.Specification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,7 @@ namespace Shipping.Core.Repositories
         Task AddAsync(T entity);
         void Update(T entity);
         void Delete(T entity);
+        Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
+        Task<T?> GetWithSpecAsync(ISpecification<T> spec);
     }
 }

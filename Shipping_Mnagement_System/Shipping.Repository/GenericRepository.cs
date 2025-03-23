@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shipping.Core.Models;
 using Shipping.Core.Repositories;
+using Shipping.Core.Specification;
 using Shipping.Repository.Data;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,22 @@ namespace Shipping.Repository
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+
+        public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec)
+        {
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        public async Task<T?> GetWithSpecAsync(ISpecification<T> spec)
+        {
+            return await ApplySpecification(spec).FirstOrDefaultAsync();
+        }
+
+        private IQueryable<T> ApplySpecification(ISpecification<T> spec)
+        {
+            return SpecificationEvaluator<T>.GetQuery(_context.Set<T>(), spec);
         }
     }
 
