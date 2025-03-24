@@ -12,7 +12,7 @@ using Shipping.Repository.Data;
 namespace Shipping.Repository.Data.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    [Migration("20250323215815_locationAndBranchesModule")]
+    [Migration("20250324213701_locationAndBranchesModule")]
     partial class locationAndBranchesModule
     {
         /// <inheritdoc />
@@ -293,6 +293,9 @@ namespace Shipping.Repository.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("BranchId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDefault")
