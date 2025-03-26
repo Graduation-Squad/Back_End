@@ -132,6 +132,12 @@ namespace Shipping_APIs
             });
             #endregion
 
+            builder.Services.AddScoped<IGovernorateService, GovernorateService>();
+            builder.Services.AddScoped<ICityService, CityService>();
+            builder.Services.AddScoped<IAreaService, AreaService>();
+
+
+
             var app = builder.Build();
 
             #region Database Migration & Seeding
