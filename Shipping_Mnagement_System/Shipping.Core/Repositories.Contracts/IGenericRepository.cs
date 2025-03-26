@@ -16,6 +16,7 @@ namespace Shipping.Core.Repositories
         Task AddAsync(T entity);
         void Update(T entity);
         void Delete(T entity);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
         Task<T?> GetWithSpecAsync(ISpecification<T> spec);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
