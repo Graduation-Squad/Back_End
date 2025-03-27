@@ -19,7 +19,5 @@ namespace Shipping.Core.Repositories
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
         Task<T?> GetWithSpecAsync(ISpecification<T> spec);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
-
     }
 }
