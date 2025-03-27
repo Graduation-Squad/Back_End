@@ -63,10 +63,16 @@ namespace Shipping.Repository
         {
             return SpecificationEvaluator<T>.GetQuery(_context.Set<T>(), spec);
         }
+<<<<<<< HEAD
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+=======
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
             return await _context.Set<T>().Where(predicate).ToListAsync();
+>>>>>>> 1a853f318a3c8a6706299bdbdca0e64eec9f67c4
         }
 
     }
