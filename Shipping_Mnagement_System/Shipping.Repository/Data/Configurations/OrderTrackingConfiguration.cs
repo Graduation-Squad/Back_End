@@ -22,7 +22,7 @@ namespace Shipping.Repository.Data.Configurations
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(ot => ot.RejectionReason)
-                   .WithMany()
+                   .WithMany(rr => rr.OrderTrackings)
                    .HasForeignKey(ot => ot.RejectionReasonId)
                    .OnDelete(DeleteBehavior.Restrict);
 

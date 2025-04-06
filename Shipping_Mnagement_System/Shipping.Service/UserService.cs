@@ -139,7 +139,6 @@ using Microsoft.IdentityModel.Tokens;
 using Shipping.Core.DomainModels;
 using Shipping.Core.DomainModels.Identity;
 using Shipping.Core.Enums;
-using Shipping.Core.Models;
 using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;

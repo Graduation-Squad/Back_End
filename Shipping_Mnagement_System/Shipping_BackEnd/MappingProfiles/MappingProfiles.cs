@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Shipping.Core.DomainModels.Identity;
-using Shipping.Core.Models;
 using Shipping.Models;
 
 namespace Shipping_APIs.MappingProfiles

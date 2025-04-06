@@ -1,5 +1,4 @@
 ﻿using Shipping.Core.DomainModels;
-using Shipping.Core.Models.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

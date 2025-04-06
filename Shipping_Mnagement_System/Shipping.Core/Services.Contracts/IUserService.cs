@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Shipping.Core.Models;
 using Shipping.Models;
 using System;
 using System.Collections.Generic;

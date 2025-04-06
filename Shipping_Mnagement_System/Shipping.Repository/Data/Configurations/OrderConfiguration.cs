@@ -40,7 +40,7 @@ namespace Shipping.Repository.Data.Configurations
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.PaymentMethod)
-                   .WithMany()
+                   .WithMany(pm => pm.Orders)
                    .HasForeignKey(o => o.PaymentMethodId)
                    .OnDelete(DeleteBehavior.Restrict);
 

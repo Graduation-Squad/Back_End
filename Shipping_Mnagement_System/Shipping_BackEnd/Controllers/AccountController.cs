@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core;
-using Shipping.Core.Models;
-using Shipping.Core.Models.Identity;
 using Shipping.Models;
 using Shipping.Service;
 using Shipping_APIs.Errors;
