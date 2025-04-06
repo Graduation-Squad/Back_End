@@ -529,6 +529,9 @@ namespace Shipping.Repository.Data.Migrations
                     b.Property<bool>("RequiresDetails")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("RejectionReason");

@@ -12,7 +12,7 @@ using Shipping.Repository.Data;
 namespace Shipping.Repository.Data.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    [Migration("20250406170436_OrderModule")]
+    [Migration("20250406195700_OrderModule")]
     partial class OrderModule
     {
         /// <inheritdoc />
@@ -531,6 +531,9 @@ namespace Shipping.Repository.Data.Migrations
 
                     b.Property<bool>("RequiresDetails")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
