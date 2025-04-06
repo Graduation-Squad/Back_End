@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Shipping.Core.Models.Identity;
+using Shipping.Core.DomainModels.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

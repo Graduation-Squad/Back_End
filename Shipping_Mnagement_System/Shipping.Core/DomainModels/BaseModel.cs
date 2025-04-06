@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shipping.Core.Models
+namespace Shipping.Core.DomainModels
 {
     public class BaseModel
     {

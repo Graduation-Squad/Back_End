@@ -1,12 +1,11 @@
-﻿using Shipping.Core.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shipping.Core.DomainModels
+namespace Shipping.Core.DomainModels.OrderModels
 {
     public class ShippingType : BaseModel
     {

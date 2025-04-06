@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shipping.Core.DomainModels;
+using Shipping.Core.DomainModels.Identity;
 using Shipping.Core.Models;
-using Shipping.Core.Models.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

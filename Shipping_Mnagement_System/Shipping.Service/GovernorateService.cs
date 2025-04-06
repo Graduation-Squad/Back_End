@@ -1,5 +1,4 @@
 ﻿using Shipping.Core.DomainModels;
-using Shipping.Core.Repositories;
 using Shipping.Core.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shipping.Core.Repositories.Contracts;
 
 namespace Shipping.Service
 {

@@ -1,4 +1,4 @@
-﻿using Shipping.Core.Models;
+﻿using Shipping.Core.DomainModels.OrderModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +14,7 @@ namespace Shipping.Core.DomainModels
 
         public ICollection<City> Cities { get; set; } = new List<City>();
         public ICollection<WeightSetting> WeightSettings { get; set; } = new List<WeightSetting>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+
     }
 }

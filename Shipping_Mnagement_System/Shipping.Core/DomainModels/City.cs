@@ -1,4 +1,4 @@
-﻿using Shipping.Core.Models;
+﻿using Shipping.Core.DomainModels.OrderModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +16,7 @@ namespace Shipping.Core.DomainModels
         public Governorate? Governorate { get; set; }
 
         public ICollection<Area> Areas { get; set; } = new List<Area>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+
     }
 }

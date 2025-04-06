@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shipping.Core.Models;
+using Shipping.Core.DomainModels;
 using Shipping.Core.Specification;
 using System;
 using System.Collections.Generic;

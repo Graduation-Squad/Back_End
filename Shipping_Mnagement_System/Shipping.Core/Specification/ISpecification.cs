@@ -1,4 +1,4 @@
-﻿using Shipping.Core.Models;
+﻿using Shipping.Core.DomainModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

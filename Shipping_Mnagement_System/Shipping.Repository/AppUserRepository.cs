@@ -1,6 +1,4 @@
-﻿using Shipping.Core.Models.Identity;
-using Shipping.Core.Repositories;
-using Shipping.Repository.Data;
+﻿using Shipping.Repository.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Shipping.Core.Repositories.Contracts;
+using Shipping.Core.DomainModels.Identity;
 
 namespace Shipping.Repository
 {

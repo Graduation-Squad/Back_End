@@ -1,11 +1,11 @@
-﻿using Shipping.Core.Models.Identity;
+﻿using Shipping.Core.DomainModels.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shipping.Core.Repositories
+namespace Shipping.Core.Repositories.Contracts
 {
     public interface IAppUserRepository
     {

@@ -1,12 +1,13 @@
-﻿using Shipping.Core.DomainModels;
-using Shipping.Core.Repositories;
+﻿using Shipping.Core.DomainModels.OrderModels;
+using Shipping.Core.Repositories.Contracts;
+using Shipping.Core.Services.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shipping.Core.Services.Contracts
+namespace Shipping.Service
 {
     public class ShippingTypeService : IShippingTypeService
     {

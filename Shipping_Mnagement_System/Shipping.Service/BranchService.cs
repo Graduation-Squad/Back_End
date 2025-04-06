@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shipping.Core.DomainModels;
-using Shipping.Core.Repositories;
+using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Services.Contracts;
 using System;
 using System.Collections.Generic;

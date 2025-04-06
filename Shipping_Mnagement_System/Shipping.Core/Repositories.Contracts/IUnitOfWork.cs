@@ -1,4 +1,4 @@
-﻿using Shipping.Core.Models;
+﻿using Shipping.Core.DomainModels;
 using Shipping.Core.Models.Identity;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shipping.Core.Repositories
+namespace Shipping.Core.Repositories.Contracts
 {
     public interface IUnitOfWork: IDisposable
     {

@@ -1,5 +1,5 @@
-﻿using Shipping.Core.Models;
-using Shipping.Core.Repositories;
+﻿using Shipping.Core.DomainModels;
+using Shipping.Core.Repositories.Contracts;
 using Shipping.Repository.Data;
 using System;
 using System.Collections.Generic;

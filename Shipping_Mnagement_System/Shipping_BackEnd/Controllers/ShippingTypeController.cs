@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Shipping.Core.DomainModels;
+using Shipping.Core.DomainModels.OrderModels;
 using Shipping.Core.Services.Contracts;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Shipping.API.Controllers
+namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

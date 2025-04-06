@@ -1,4 +1,4 @@
-﻿using Shipping.Core.Models;
+﻿using Shipping.Core.DomainModels.OrderModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -21,5 +21,7 @@ namespace Shipping.Core.DomainModels
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<UserBranch> UserBranches { get; set; } = new List<UserBranch>();
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+
     }
 }

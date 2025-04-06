@@ -1,4 +1,4 @@
-﻿using Shipping.Core.Models;
+﻿using Shipping.Core.DomainModels;
 using Shipping.Core.Specification;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shipping.Core.Repositories
+namespace Shipping.Core.Repositories.Contracts
 {
     public interface IGenericRepository<T> where T : BaseModel
     {
