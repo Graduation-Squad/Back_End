@@ -32,6 +32,7 @@ namespace Shipping.Repository
         {
             return await _dbSet.FindAsync(id);
         }
+       
 
         public async Task AddAsync(T entity)
         {
@@ -46,6 +47,16 @@ namespace Shipping.Repository
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
+        public async Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.SingleOrDefaultAsync(predicate);
         }
 
 
@@ -64,10 +75,7 @@ namespace Shipping.Repository
             return SpecificationEvaluator<T>.GetQuery(_context.Set<T>(), spec);
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbSet.Where(predicate).ToListAsync();
-        }
+       
     }
 
 }

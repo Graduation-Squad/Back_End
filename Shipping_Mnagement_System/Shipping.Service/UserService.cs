@@ -1,137 +1,4 @@
-﻿//    using Microsoft.AspNetCore.Identity;
-//using Shipping.Core;
-//using Shipping.Core.Models;
-//using Shipping.Core.Models.Identity;
-//using Shipping.Core.Repositories;
-//using Shipping.Core.Services.Contracts;
-//using Shipping.Models;
-//using Shipping.Repository.Data;
-//using System;
-//using System.Collections.Generic;
-//using System.ComponentModel.DataAnnotations;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-
-//namespace Shipping.Service
-//{
-//    public class UserService : IUserService
-//    {
-//        private readonly IUnitOfWork _unitOfWork;
-//        private readonly UserManager<AppUser> _userManager;
-
-//        public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager)
-//        {
-//            _unitOfWork = unitOfWork;
-//            _userManager = userManager;
-//        }
-
-//        public async Task<DeliveryMan> RegisterDeliveryManAsync(DeliveryManRegistrationModel model)
-//        {
-//            //create appuser
-//            var appUser = new AppUser
-//            {
-//                Email = model.Email,
-//                UserName = model.Email.Split('@')[0],
-//                FullName = model.FullName,
-//                PhoneNumber = model.PhoneNumber,
-//                Address = model.Address
-//            };
-//            var result = await _userManager.CreateAsync(appUser, model.Password);
-
-//            //assign role
-//            if (!result.Succeeded)
-//                throw new Exception(result.Errors.FirstOrDefault().Description);
-
-//            //create deliveryman record
-//            var deliveryman = new DeliveryMan
-//            {
-//                AppUserId = appUser.Id,
-//                VehicleNumber = model.VehicleNumber,
-//                LicenseNumber = model.LicenseNumber
-//            };
-//            await _unitOfWork.Repository<DeliveryMan>().AddAsync(deliveryman);
-
-//            //save changes
-//            await _unitOfWork.CompleteAsync();
-
-//            //return deliveryman
-//            return deliveryman; 
-//        }
-
-//        public async Task<Employee> RegisterEmployeeAsync(EmployeeRegistrationModel model)
-//        {
-
-//            //create appuser and assign role
-//            var appUser = new AppUser
-//            {
-//                Email = model.Email,
-//                UserName = model.Email.Split('@')[0],
-//                FullName = model.FullName,
-//                PhoneNumber = model.PhoneNumber,
-//                Address = model.Address
-//            };
-//            var result = await _userManager.CreateAsync(appUser, model.Password);
-
-//            if (!result.Succeeded)
-//                throw new Exception(result.Errors.FirstOrDefault().Description);
-
-//            //assign role
-//            await _userManager.AddToRoleAsync(appUser, "Employee");
-
-//            //create employee record
-//            var employee = new Employee
-//            {
-//                AppUserId = appUser.Id,
-//                EmployeeCode = model.EmployeeCode,
-//                Department = model.Department
-//            };
-//            await _unitOfWork.Repository<Employee>().AddAsync(employee);
-
-//            //save changes
-//            await _unitOfWork.CompleteAsync();
-
-//            return employee;
-
-
-//        }
-
-//        public async Task<Merchant> RegisterMerchantAsync(MerchantRegistrationModel model)
-//        {
-//            //create appuser 
-//            var appUser = new AppUser
-//            {
-//                Email = model.Email,
-//                UserName = model.Email.Split('@')[0],
-//                FullName = model.FullName,
-//                PhoneNumber = model.PhoneNumber,
-//                Address = model.Address
-//            };
-//            var result = await _userManager.CreateAsync(appUser, model.Password);
-//            if (!result.Succeeded)
-//                throw new Exception(result.Errors.FirstOrDefault().Description);
-
-//            //assign role
-//            await _userManager.AddToRoleAsync(appUser, "Merchant");
-
-//            //create merchant record
-//            var merchant = new Merchant
-//            {
-//                AppUserId = appUser.Id,
-//                StoreName = model.StoreName,
-//                StoreAddress = model.StoreAddress
-//            };
-//            await _unitOfWork.Repository<Merchant>().AddAsync(merchant);
-
-//            //save changes
-//            await _unitOfWork.CompleteAsync();
-
-//            //return merchant   
-//            return merchant;
-//        }
-//    }
-//}
-
+﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -157,28 +24,26 @@ namespace Shipping.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _configuration;
-
-        public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IConfiguration configuration)
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
         {
+            // Parse string to enum
             if (!Enum.TryParse(request.UserType, out UserType userType))
             {
                 throw new Exception("Invalid UserType.");
             }
 
-            if (userType == UserType.Employee)
+            if (userType == UserType.Employee && !request.UserGroupId.HasValue)
             {
-                var userGroup = await _unitOfWork.Repository<UserGroup>().GetByIdAsync(request.UserGroupId.Value);
-                if (userGroup == null)
-                {
-                    throw new Exception("UserGroup not found.");
-                }
+                throw new Exception("UserGroupId is required for Employees.");
             }
 
             if (await _userManager.FindByEmailAsync(request.Email) != null)
@@ -186,21 +51,50 @@ namespace Shipping.Service
                 throw new Exception("Email is already registered.");
             }
 
-
             var user = new AppUser
             {
                 Email = request.Email,
                 UserName = request.Email.Split("@")[0],
                 FullName = request.FullName,
                 PhoneNumber = request.PhoneNumber,
-                UserType = Enum.Parse<UserType>(request.UserType),
-                UserGroupId = (Enum.Parse<UserType>(request.UserType) == UserType.Employee) ? request.UserGroupId : null    
+                UserType = userType,  // Use the parsed enum
+                UserGroupId = userType == UserType.Employee ? request.UserGroupId : null
             };
 
-            var result =await  _userManager.CreateAsync(user, request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
 
             if (!result.Succeeded)
-                throw new Exception(result.Errors.FirstOrDefault().Description);
+                throw new Exception(result.Errors.FirstOrDefault()?.Description);
+
+            // Get the role name from the enum
+            var roleName = userType.ToString();
+
+            // Validate role name is not empty  
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                throw new InvalidOperationException("Invalid role name generated from UserType");
+            }
+
+            // Check if role exists (case-sensitive check)
+            if (!await _roleManager.RoleExistsAsync(roleName))
+            {
+                // Create the role if it doesn't exist
+                var roleCreationResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+                if (!roleCreationResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleCreationResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Failed to create role '{roleName}': {errors}");
+                }
+            }
+
+            // Assign the role to the user
+            var roleAssignmentResult = await _userManager.AddToRoleAsync(user, roleName);
+            if (!roleAssignmentResult.Succeeded)
+            {
+                var errors = string.Join(", ", roleAssignmentResult.Errors.Select(e => e.Description));
+                throw new Exception($"Failed to assign role '{roleName}' to user: {errors}");
+            }
 
             return new RegisterResponse
             {
@@ -208,9 +102,12 @@ namespace Shipping.Service
                 Email = user.Email,
                 FullName = user.FullName,
                 Username = user.UserName,
-                UserType = user.UserType.ToString()
+                UserType = userType.ToString()
             };
         }
+
+
+
         public async Task<string> LoginAsync(LoginModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
