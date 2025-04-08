@@ -17,6 +17,7 @@ namespace Shipping.Core.Repositories.Contracts
         void Update(T entity);
         void Delete(T entity);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        Task<T?> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
         Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecification<T> spec);
         Task<T?> GetWithSpecAsync(ISpecification<T> spec);
     }
