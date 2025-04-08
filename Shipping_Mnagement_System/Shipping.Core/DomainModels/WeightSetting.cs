@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Shipping.Core.DomainModels
 {
     public class WeightSetting : BaseModel
+ 
     {
         public decimal BaseWeight { get; set; }
         public decimal AdditionalWeightPrice { get; set; }
