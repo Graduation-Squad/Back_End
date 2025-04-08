@@ -11,8 +11,11 @@ namespace Shipping.Repository.Data.Configurations
 {
     public class DeliveryManConfigurations : IEntityTypeConfiguration<DeliveryMan>
     {
+
         public void Configure(EntityTypeBuilder<DeliveryMan> builder)
         {
+            builder.Property(m => m.DiscountValue).HasColumnType("decimal(18,2)");
+
             builder.HasOne(d => d.AppUser)
                 .WithOne(a => a.DeliveryMan)
                 .HasForeignKey<DeliveryMan>(d => d.AppUserId)
