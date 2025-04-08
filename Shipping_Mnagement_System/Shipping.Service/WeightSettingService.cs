@@ -102,5 +102,8 @@ namespace Shipping.Service
             return setting.BaseWeightPrice + (extraWeight * setting.AdditionalWeightPrice);
         }
     }
+<<<<<<< HEAD
+=======
 
+>>>>>>> 79e5af489c0a64897089dbc17543026ea5eef071
 }

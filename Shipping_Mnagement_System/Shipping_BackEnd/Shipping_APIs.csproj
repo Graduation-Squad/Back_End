@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Shipping.Core\Shipping.Core.csproj" />
     <ProjectReference Include="..\Shipping.Repository\Shipping.Repository.csproj" />
     <ProjectReference Include="..\Shipping.Service\Shipping.Service.csproj" />
   </ItemGroup>

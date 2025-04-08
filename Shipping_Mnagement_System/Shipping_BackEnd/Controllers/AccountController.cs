@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core;
@@ -15,6 +16,7 @@ namespace Shipping_APIs.Controllers
         private readonly UserService _userService;
         private readonly IMapper _mapper;
 
+
         public AccountController(UserService userService, IMapper mapper)
         {
             _userService = userService;
@@ -22,6 +24,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]  // Only Admin can access this endpoint
         public async Task<ActionResult> Register(RegisterRequest model)
         {
             try
@@ -34,6 +37,7 @@ namespace Shipping_APIs.Controllers
                 return BadRequest(new ApiErrorResponse(400, ex.Message));
             }
         }
+
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginModel model)
         {
