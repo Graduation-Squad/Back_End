@@ -20,7 +20,7 @@ namespace Shipping.Repository.Data.Configurations
 
             // Relationships
             builder.HasOne(o => o.Merchant)
-                   .WithMany(u => u.Merchant.CreatedOrders)
+                   .WithMany(u => u.CreatedOrders)
                    .HasForeignKey(o => o.MerchantId)
                    .OnDelete(DeleteBehavior.Restrict);
 
@@ -55,7 +55,7 @@ namespace Shipping.Repository.Data.Configurations
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.DeliveryAgent)
-                   .WithMany(u => u.DeliveryMan.AssignedOrders)
+                   .WithMany(u => u.AssignedOrders)
                    .HasForeignKey(o => o.DeliveryAgentId)
                    .OnDelete(DeleteBehavior.Restrict);
 

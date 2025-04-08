@@ -11,8 +11,8 @@ namespace Shipping.Core.DomainModels.OrderModels
     public class Order : BaseModel
     {
         public string OrderNumber { get; set; }
-        public string MerchantId { get; set; }
-        public AppUser Merchant { get; set; }
+        public int MerchantId { get; set; }
+        public Merchant Merchant { get; set; }
 
         // location
         public int AreaId { get; set; }
@@ -44,8 +44,8 @@ namespace Shipping.Core.DomainModels.OrderModels
         public string CreatedById { get; set; }
         public AppUser CreatedBy { get; set; }
 
-        public string? DeliveryAgentId { get; set; }
-        public AppUser DeliveryAgent { get; set; }
+        public int? DeliveryAgentId { get; set; }
+        public DeliveryMan DeliveryAgent { get; set; }
 
         public int BranchId { get; set; }
         public Branch Branch { get; set; }
