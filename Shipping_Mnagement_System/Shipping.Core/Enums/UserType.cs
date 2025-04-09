@@ -8,10 +8,11 @@ namespace Shipping.Core.Enums
 {
     public enum UserType
     {
-        Admin,
-        Employee,
-        Manager,
-        Merchant,
-        DeliveryMan,
+        Admin = 1,
+        Manager = 2,
+        Employee = 3,
+        DeliveryAgent = 4,
+        Merchant = 5,
+        Customer = 6
     }
 }

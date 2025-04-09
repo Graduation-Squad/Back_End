@@ -26,7 +26,7 @@ namespace Shipping.Core.DomainModels.OrderModels
         public decimal TotalWeight { get; set; }
         public decimal ShippingCost { get; set; }
         public decimal CODAmount { get; set; }
-        public OrderStatus Status { get; set; } = OrderStatus.New;
+        public OrderStatus Status { get; set; } = OrderStatus.Created;
         public string Notes { get; set; }
 
         // configurable options

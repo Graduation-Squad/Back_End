@@ -8,11 +8,12 @@ namespace Shipping.Core.Enums
 {
     public enum OrderStatus
     {
-        New,
-        Assigned,
-        InProgress,
-        Delivered,
-        Returned,
-        Cancelled
+        Created = 1,        
+        Processing = 2,     
+        Shipped = 3,        
+        Delivered = 4,      
+        Rejected = 5, 
+        Returned = 6, 
+        Cancelled = 7  
     }
 }
