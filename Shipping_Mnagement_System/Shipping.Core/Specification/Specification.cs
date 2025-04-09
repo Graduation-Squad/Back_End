@@ -42,15 +42,25 @@ namespace Shipping.Core.Specification
         {
             Includes.Add(includeExpression);
         }
+
+        //gpt
         public void AddSorting(string sortBy, bool isSortAscending)
         {
+            if (string.IsNullOrWhiteSpace(sortBy))
+                return;
+
+            var parameter = Expression.Parameter(typeof(T), "x"); //defines the parameter x =>
+            var property = Expression.PropertyOrField(parameter, sortBy); // gets the property value dynamically
+            var converted = Expression.Convert(property, typeof(object)); // box value type if needed
+            var expression = Expression.Lambda<Func<T, object>>(converted, parameter); //wraps it into expression
+
             if (isSortAscending)
             {
-                AddOrderBy(x => x.GetType().GetProperty(sortBy).GetValue(x, null));
+                AddOrderBy(expression);
             }
             else
             {
-                AddOrderByDesc(x => x.GetType().GetProperty(sortBy).GetValue(x, null));
+                AddOrderByDesc(expression);
             }
         }
 
