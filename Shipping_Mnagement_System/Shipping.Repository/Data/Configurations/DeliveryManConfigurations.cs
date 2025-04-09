@@ -15,6 +15,7 @@ namespace Shipping.Repository.Data.Configurations
         public void Configure(EntityTypeBuilder<DeliveryMan> builder)
         {
             builder.Property(m => m.DiscountValue).HasColumnType("decimal(18,2)");
+            builder.Property(m => m.DiscountType).HasConversion<string>();
 
             builder.HasOne(d => d.AppUser)
                 .WithOne(a => a.DeliveryMan)

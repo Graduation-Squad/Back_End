@@ -13,8 +13,5 @@ namespace Shipping.Models
         public decimal AdditionalWeightPrice { get; set; }
         public int GovernorateId { get; set; }
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> 79e5af489c0a64897089dbc17543026ea5eef071
 }

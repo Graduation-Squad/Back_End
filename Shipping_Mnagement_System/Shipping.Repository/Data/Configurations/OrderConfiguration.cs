@@ -17,6 +17,8 @@ namespace Shipping.Repository.Data.Configurations
             builder.Property(o => o.TotalWeight).HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(o => o.ShippingCost).HasColumnType("decimal(18,2)").IsRequired();
             builder.Property(o => o.CODAmount).HasColumnType("decimal(18,2)").IsRequired();
+            builder.Property(o => o.Status).IsRequired().HasConversion<string>();
+
 
             // Relationships
             builder.HasOne(o => o.Merchant)

@@ -24,7 +24,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")]  // Only Admin can access this endpoint
+        //[Authorize(Roles = "Admin")]  // Only Admin can access this endpoint
         public async Task<ActionResult> Register(RegisterRequest model)
         {
             try

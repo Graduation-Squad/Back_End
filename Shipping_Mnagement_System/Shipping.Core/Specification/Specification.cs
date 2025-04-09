@@ -34,5 +34,31 @@ namespace Shipping.Core.Specification
         {
             OrderByDesc = orderByDescExpression;
         }
+        public void AddCriteria(Expression<Func<T, bool>> criteriaExpression)
+        {
+            Criteria = criteriaExpression;
+        }
+        public void AddInclude(Expression<Func<T, object>> includeExpression)
+        {
+            Includes.Add(includeExpression);
+        }
+        public void AddSorting(string sortBy, bool isSortAscending)
+        {
+            if (isSortAscending)
+            {
+                AddOrderBy(x => x.GetType().GetProperty(sortBy).GetValue(x, null));
+            }
+            else
+            {
+                AddOrderByDesc(x => x.GetType().GetProperty(sortBy).GetValue(x, null));
+            }
+        }
+
+        public void AddPaging(int pageNumber, int pageSize)
+        {
+            Skip = (pageNumber - 1) * pageSize;
+            Take = pageSize;
+        }
+
     }
 }

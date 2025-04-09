@@ -13,6 +13,7 @@ namespace Shipping.Repository.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UserBranch> builder)
         {
+
             builder.HasKey(ub => new { ub.UserId, ub.BranchId });
 
             builder.HasOne(ub => ub.User)

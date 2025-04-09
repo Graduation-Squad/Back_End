@@ -10,6 +10,7 @@ namespace Shipping.Core.Enums
     {
         Admin,
         Employee,
+        Manager,
         Merchant,
         DeliveryMan,
     }

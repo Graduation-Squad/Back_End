@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 ﻿using Shipping.Models;
-=======
 ﻿using Shipping.Core.DomainModels;
 using Shipping.Models;
->>>>>>> 79e5af489c0a64897089dbc17543026ea5eef071
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,8 +18,5 @@ namespace Shipping.Core.Services.Contracts
         Task DeleteAsync(int id);
         Task<decimal> CalculateCostAsync(int governorateId, decimal weight);
     }
-<<<<<<< HEAD
-=======
 
->>>>>>> 79e5af489c0a64897089dbc17543026ea5eef071
 }
