@@ -9,7 +9,7 @@ namespace Shipping.Core.Enums
     public enum OrderStatus
     {
         Created = 1,
-        Assigned = 2,     // 👈 Add this here
+        Assigned = 2,      
         Processing = 3,
         Shipped = 4,
         Delivered = 5,

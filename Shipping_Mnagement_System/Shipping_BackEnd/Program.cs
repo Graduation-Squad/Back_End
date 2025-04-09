@@ -83,6 +83,7 @@ namespace Shipping_APIs
             builder.Services.AddScoped<IBranchService, BranchService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderTrackingService, OrderTrackingService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
 
             // ? AutoMapper Configuration
             builder.Services.AddAutoMapper(config => config.AddProfile(new MappingProfiles.MappingProfiles()));
