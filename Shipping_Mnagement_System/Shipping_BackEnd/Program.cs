@@ -82,6 +82,7 @@ namespace Shipping_APIs
             builder.Services.AddScoped<IUserGroupService, UserGroupService>();
             builder.Services.AddScoped<IBranchService, BranchService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderTrackingService, OrderTrackingService>();
 
             // ? AutoMapper Configuration
             builder.Services.AddAutoMapper(config => config.AddProfile(new MappingProfiles.MappingProfiles()));
@@ -152,6 +153,11 @@ namespace Shipping_APIs
             try
             {
                 await context.Database.MigrateAsync();
+
+                //Seed roles and admin
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
+                await IdentitySeedData.Initialize(roleManager, userManager);
             }
             catch (Exception e)
             {

@@ -110,14 +110,21 @@ namespace Shipping.Service
 
         public async Task<string> LoginAsync(LoginModel model)
         {
+            Console.WriteLine($"Login attempt for email: {model.Email}"); // Debug
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
+            {
+                Console.WriteLine("User not found"); // Debug
                 throw new UnauthorizedAccessException("Invalid email or password");
+            }
 
             bool isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!isPasswordValid)
+            {
+                Console.WriteLine("Invalid password"); // Debug
                 throw new UnauthorizedAccessException("Invalid email or password");
-
+            }
+            Console.WriteLine($"User found: {user.Email}"); // Debug
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var claims = new List<Claim>
