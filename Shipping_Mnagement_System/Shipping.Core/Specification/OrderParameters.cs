@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shipping.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,15 @@ namespace Shipping.Core.Specification
     public class OrderParameters
     {
         private const int MAX_PAGE_SIZE = 10;
-        public string? Search { get; set; }
+        public int? MerchantId { get; set; }
+        public int? DeliveryAgentId { get; set; }
+        public int? BranchId { get; set; }
+        public int? AreaId { get; set; }
+        public int? CityId { get; set; }
+        public int? GovernorateId { get; set; }
+        public string? Status { get; set; }
+        public int? PaymentMethodId { get; set; }
+        public int? ShippingTypeId { get; set; }
         public string? SortBy { get; set; }
         public bool IsSortAscending { get; set; } = true;
         public int PageNumber { get; set; } = 1;

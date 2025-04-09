@@ -1,4 +1,5 @@
 ﻿using Shipping.Core.DomainModels.OrderModels;
+using Shipping.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +14,25 @@ namespace Shipping.Core.Specification
         {
             _addIncludes();
 
-            if (!string.IsNullOrEmpty(orderParameters.Search))
+            OrderStatus? parsedStatus = null;
+            if (!string.IsNullOrEmpty(orderParameters.Status) &&
+                Enum.TryParse<OrderStatus>(orderParameters.Status, true, out var status))
             {
-                AddCriteria(
-                    o => o.Merchant.AppUser.Email.Contains(orderParameters.Search) ||
-                    o.DeliveryAgent.AppUser.Email.Contains(orderParameters.Search) ||
-                    o.Status.ToString().Contains(orderParameters.Search) ||
-                    o.Branch.Name.Contains(orderParameters.Search) ||
-                    o.Area.Name.Contains(orderParameters.Search) ||
-                    o.City.Name.Contains(orderParameters.Search) ||
-                    o.Governorate.Name.Contains(orderParameters.Search)
-                );
+                parsedStatus = status;
             }
+
+            AddCriteria(o =>
+                (!orderParameters.MerchantId.HasValue || o.MerchantId == orderParameters.MerchantId) &&
+                (!orderParameters.DeliveryAgentId.HasValue || o.DeliveryAgentId == orderParameters.DeliveryAgentId) &&
+                (!orderParameters.BranchId.HasValue || o.BranchId == orderParameters.BranchId) &&
+                (!orderParameters.AreaId.HasValue || o.AreaId == orderParameters.AreaId) &&
+                (!orderParameters.CityId.HasValue || o.CityId == orderParameters.CityId) &&
+                (!orderParameters.GovernorateId.HasValue || o.GovernorateId == orderParameters.GovernorateId) &&
+                (!orderParameters.PaymentMethodId.HasValue || o.PaymentMethodId == orderParameters.PaymentMethodId) &&
+                (!orderParameters.ShippingTypeId.HasValue || o.ShippingTypeId == orderParameters.ShippingTypeId) &&
+                (!parsedStatus.HasValue || o.Status == parsedStatus)
+            );
+
 
             if (!string.IsNullOrEmpty(orderParameters.SortBy))
             {
