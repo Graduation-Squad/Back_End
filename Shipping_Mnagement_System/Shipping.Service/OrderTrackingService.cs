@@ -7,7 +7,6 @@ using Shipping.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Shipping.Service
@@ -21,12 +20,13 @@ namespace Shipping.Service
             _unitOfWork = unitOfWork;
         }
 
+        // Get tracking history for an order
         public async Task<List<OrderTrackingDto>> GetTrackingHistoryAsync(int orderId)
         {
             var spec = new OrderWithTrackingSpecification(orderId);
             var order = await _unitOfWork.Repository<Order>().GetWithSpecAsync(spec);
 
-            if (order == null) return new();
+            if (order == null) return new List<OrderTrackingDto>();
 
             return order.OrderTrackings.OrderBy(t => t.Timestamp).Select(t => new OrderTrackingDto
             {
@@ -39,18 +39,19 @@ namespace Shipping.Service
             }).ToList();
         }
 
+        // Add a tracking entry for an order
         public async Task AddTrackingEntryAsync(int orderId, CreateOrderTrackingDto dto, string userId)
         {
-            // Parse the string status to the OrderStatus enum
+            // Parse the status string to the OrderStatus enum
             if (!Enum.TryParse<OrderStatus>(dto.Status, out var parsedStatus))
             {
-                throw new ArgumentException($"Invalid status value: {dto.Status}");
+                throw new ArgumentException($"Invalid status value: {dto.Status}. Valid values are: {string.Join(", ", Enum.GetNames(typeof(OrderStatus)))}.");
             }
 
             var entry = new OrderTracking
             {
                 OrderId = orderId,
-                Status = parsedStatus, // Use the parsed enum value
+                Status = parsedStatus,
                 Notes = dto.Notes,
                 RejectionReasonId = dto.RejectionReasonId,
                 RejectionDetails = dto.RejectionDetails,
@@ -60,16 +61,17 @@ namespace Shipping.Service
 
             await _unitOfWork.Repository<OrderTracking>().AddAsync(entry);
 
-            // update current order status
+            // Update current order status
             var order = await _unitOfWork.Repository<Order>().GetByIdAsync(orderId);
-            if (order != null)
+            if (order == null)
             {
-                order.Status = parsedStatus; // Use the parsed enum value
-                order.UpdatedAt = DateTime.UtcNow;
+                throw new ArgumentException("Order not found.");
             }
+
+            order.Status = parsedStatus;
+            order.UpdatedAt = DateTime.UtcNow;
 
             await _unitOfWork.CompleteAsync();
         }
     }
-
 }

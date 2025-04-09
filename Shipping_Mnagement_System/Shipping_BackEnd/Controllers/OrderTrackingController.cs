@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Shipping_APIs.Controllers
 {
@@ -13,26 +14,50 @@ namespace Shipping_APIs.Controllers
     {
         private readonly IOrderTrackingService _service;
 
+         
         public OrderTrackingController(IOrderTrackingService service)
         {
             _service = service;
         }
 
+         
         [HttpGet]
         public async Task<IActionResult> GetHistory(int orderId)
         {
             var result = await _service.GetTrackingHistoryAsync(orderId);
+            if (result == null || result.Count == 0)
+            {
+                return NotFound($"No tracking history found for Order ID: {orderId}");
+            }
             return Ok(result);
         }
 
+        
         [HttpPost]
-        [Authorize(Roles = "Admin,Employee")]
+        [Authorize(Roles = "Admin,Employee")]  
         public async Task<IActionResult> AddTracking(int orderId, CreateOrderTrackingDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _service.AddTrackingEntryAsync(orderId, dto, userId);
-            return Ok();
+            try
+            {
+                 
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authorized to add tracking.");
+                }
+
+                await _service.AddTrackingEntryAsync(orderId, dto, userId);
+                return Ok("Tracking entry added successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest($"Invalid input: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
+            }
         }
     }
-
 }

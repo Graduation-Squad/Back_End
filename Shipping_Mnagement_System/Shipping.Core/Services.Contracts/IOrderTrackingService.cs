@@ -1,8 +1,6 @@
 ﻿using Shipping.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Shipping.Core.Services.Contracts
@@ -12,5 +10,4 @@ namespace Shipping.Core.Services.Contracts
         Task<List<OrderTrackingDto>> GetTrackingHistoryAsync(int orderId);
         Task AddTrackingEntryAsync(int orderId, CreateOrderTrackingDto dto, string userId);
     }
-
 }
