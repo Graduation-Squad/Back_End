@@ -69,8 +69,33 @@ namespace Shipping_APIs
             });
 
             // ? Identity Configuration
-            builder.Services.AddIdentity<AppUser, IdentityRole>()
-                .AddEntityFrameworkStores<ShippingContext>();
+            //builder.Services.AddIdentity<AppUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ShippingContext>();
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+            {
+                 
+                options.Password.RequireDigit = true;   
+                options.Password.RequireLowercase = true;   
+                options.Password.RequireUppercase = true;   
+                options.Password.RequireNonAlphanumeric = true;   
+                options.Password.RequiredLength = 8;   
+                options.Password.RequiredUniqueChars = 1;  
+
+                // Configure lockout policy
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+
+                // Configure user settings
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = true;   
+            })
+            .AddEntityFrameworkStores<ShippingContext>()
+            .AddDefaultTokenProviders();
+
+
+
 
             // ? Dependency Injection
             builder.Services.AddScoped<RoleManager<IdentityRole>>();
@@ -85,6 +110,9 @@ namespace Shipping_APIs
             builder.Services.AddScoped<IOrderTrackingService, OrderTrackingService>();
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IAdminService, AdminService>();
+
 
             // ? AutoMapper Configuration
             builder.Services.AddAutoMapper(config => config.AddProfile(new MappingProfiles.MappingProfiles()));
@@ -159,7 +187,10 @@ namespace Shipping_APIs
                 //Seed roles and admin
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
-                await IdentitySeedData.Initialize(roleManager, userManager);
+                var emailService = services.GetRequiredService<IEmailService>();
+                await IdentitySeedData.Initialize(roleManager, userManager, emailService, services.GetRequiredService<ShippingContext>());
+
+
             }
             catch (Exception e)
             {
