@@ -36,6 +36,9 @@ namespace Shipping.Core.DomainModels.OrderModels
         public int ShippingTypeId { get; set; }
         public ShippingType ShippingType { get; set; }
 
+        public bool IsVillageDelivery { get; set; } = false;
+
+
         // tracking
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

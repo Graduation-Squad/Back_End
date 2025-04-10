@@ -14,6 +14,7 @@ namespace Shipping.Models
         public decimal? TotalWeight { get; set; }
         public int? PaymentMethodId { get; set; }
         public int? DeliveryOptionId { get; set; }
-        public string Notes { get; set; }
+        public bool? IsVillageDelivery { get; set; }
+        public string? Notes { get; set; }
     }
 }

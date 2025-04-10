@@ -31,6 +31,8 @@ namespace Shipping.Models
         [Required]
         public int DeliveryOptionId { get; set; }
 
+        public bool IsVillageDelivery { get; set; } = false;
+
         [Required]
         public int BranchId { get; set; }
 

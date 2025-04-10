@@ -80,7 +80,7 @@ namespace Shipping.Service
 
         public async Task<Order> CreateOrderAsync(OrderCreateDto dto)
         {
-            decimal shippingCost = await calculateShippingCost(dto.TotalWeight, dto.GovernorateId, dto.DeliveryOptionId);
+            decimal shippingCost = await calculateShippingCost(dto.TotalWeight, dto.GovernorateId, dto.DeliveryOptionId, dto.IsVillageDelivery);
             var order = new Order
             {
                 OrderNumber = Guid.NewGuid().ToString().Substring(0, 8),
@@ -120,15 +120,16 @@ namespace Shipping.Service
             if (dto.TotalWeight.HasValue) order.TotalWeight = dto.TotalWeight.Value;
             if (dto.PaymentMethodId.HasValue) order.PaymentMethodId = dto.PaymentMethodId.Value;
             if (dto.DeliveryOptionId.HasValue) order.ShippingTypeId = dto.DeliveryOptionId.Value;
+            if (dto.IsVillageDelivery.HasValue) order.IsVillageDelivery = dto.IsVillageDelivery.Value;
             if (!string.IsNullOrEmpty(dto.Notes)) order.Notes = dto.Notes;
 
-           if(dto.TotalWeight.HasValue || dto.DeliveryOptionId.HasValue || dto.GovernorateId.HasValue)
+           if(dto.TotalWeight.HasValue || dto.DeliveryOptionId.HasValue || dto.GovernorateId.HasValue || dto.IsVillageDelivery.HasValue)
            {
-                decimal shippingCost = await calculateShippingCost(order.TotalWeight, order.GovernorateId, order.ShippingTypeId);
+                decimal shippingCost = await calculateShippingCost(order.TotalWeight, order.GovernorateId, order.ShippingTypeId, order.IsVillageDelivery);
                 order.ShippingCost = shippingCost;
                 order.CODAmount = shippingCost;
            }
-
+           
             order.UpdatedAt = DateTime.UtcNow;
 
             _unitOfWork.Repository<Order>().Update(order);
@@ -176,8 +177,10 @@ namespace Shipping.Service
             return await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(spec);
         }
 
-        public async Task<decimal> calculateShippingCost(decimal weight, int governateId, int shippingTypeId)
+        public async Task<decimal> calculateShippingCost(decimal weight, int governateId, int shippingTypeId, bool IsVillageDelivery)
         {
+            decimal villageExtra = IsVillageDelivery is true ? 10 : 0;
+
             var weightSetting = await _unitOfWork.Repository<WeightSetting>().GetByIdAsync(governateId);
             if (weightSetting == null) throw new Exception("Weight setting not found.");
 
@@ -190,13 +193,13 @@ namespace Shipping.Service
             decimal additionalWeightPrice = weightSetting.AdditionalWeightPrice;
             if (weight <= baseWeight)
             {
-                return baseWeightPrice + shippingTypeCost;
+                return baseWeightPrice + shippingTypeCost + villageExtra;
             }
             else
             {
                 decimal additionalWeight = weight - baseWeight;
                 decimal additionalCost = Math.Ceiling(additionalWeight) * additionalWeightPrice;
-                return baseWeightPrice + additionalCost + shippingTypeCost;
+                return baseWeightPrice + additionalCost + shippingTypeCost + villageExtra;
             }
         }
     }
