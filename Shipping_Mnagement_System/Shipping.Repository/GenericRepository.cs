@@ -87,5 +87,18 @@ namespace Shipping.Repository
         {
             return await _dbSet.Where(predicate).ToListAsync();   
         }
+
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate = null) 
+            //SELECT COUNT(*) FROM [Table] WHERE [predicate], Count directly in DB
+        {
+            if (predicate == null)
+            {
+                return await _dbSet.CountAsync();
+            }
+            else
+            {
+                return await _dbSet.CountAsync(predicate);
+            }
+        }
     }
 }

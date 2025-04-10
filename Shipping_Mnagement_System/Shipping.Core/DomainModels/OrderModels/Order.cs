@@ -41,8 +41,8 @@ namespace Shipping.Core.DomainModels.OrderModels
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         // relationships
-        public string CreatedById { get; set; }
-        public AppUser CreatedBy { get; set; }
+        public int? CreatedById { get; set; }
+        public Employee? CreatedBy { get; set; }
 
         public int? DeliveryAgentId { get; set; }
         public DeliveryMan DeliveryAgent { get; set; }

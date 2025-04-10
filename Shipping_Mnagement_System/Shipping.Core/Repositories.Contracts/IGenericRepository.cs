@@ -20,5 +20,7 @@ namespace Shipping.Core.Repositories.Contracts
         Task<T?> GetWithSpecAsync(ISpecification<T> spec);
         Task<IReadOnlyList<T>> GetAllAsync(Expression<Func<T, bool>> predicate);
 
+        Task<int> CountAsync(Expression<Func<T, bool>> predicate = null);
+
     }
 }
