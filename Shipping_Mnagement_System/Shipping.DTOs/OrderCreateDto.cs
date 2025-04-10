@@ -34,7 +34,6 @@ namespace Shipping.Models
         [Required]
         public int BranchId { get; set; }
 
-        public decimal CODAmount { get; set; }
         public string Notes { get; set; }
     }
 }

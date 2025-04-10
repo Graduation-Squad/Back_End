@@ -1,4 +1,5 @@
-﻿using Shipping.Core.DomainModels.OrderModels;
+﻿using Shipping.Core.DomainModels;
+using Shipping.Core.DomainModels.OrderModels;
 using Shipping.Core.Enums;
 using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Services.Contracts;
@@ -79,6 +80,7 @@ namespace Shipping.Service
 
         public async Task<Order> CreateOrderAsync(OrderCreateDto dto)
         {
+            decimal shippingCost = await calculateShippingCost(dto.TotalWeight, dto.GovernorateId, dto.DeliveryOptionId);
             var order = new Order
             {
                 OrderNumber = Guid.NewGuid().ToString().Substring(0, 8),
@@ -90,10 +92,9 @@ namespace Shipping.Service
                 ShippingTypeId = dto.DeliveryOptionId,
                 BranchId = dto.BranchId,
                 TotalWeight = dto.TotalWeight,
-                CODAmount = dto.CODAmount,
+                ShippingCost = shippingCost,
+                CODAmount = shippingCost,
                 Notes = dto.Notes,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
 
             await _unitOfWork.Repository<Order>().AddAsync(order);
@@ -119,10 +120,18 @@ namespace Shipping.Service
             if (dto.TotalWeight.HasValue) order.TotalWeight = dto.TotalWeight.Value;
             if (dto.PaymentMethodId.HasValue) order.PaymentMethodId = dto.PaymentMethodId.Value;
             if (dto.DeliveryOptionId.HasValue) order.ShippingTypeId = dto.DeliveryOptionId.Value;
-            if (dto.CODAmount.HasValue) order.CODAmount = dto.CODAmount.Value;
             if (!string.IsNullOrEmpty(dto.Notes)) order.Notes = dto.Notes;
 
+           if(dto.TotalWeight.HasValue || dto.DeliveryOptionId.HasValue || dto.GovernorateId.HasValue)
+           {
+                decimal shippingCost = await calculateShippingCost(order.TotalWeight, order.GovernorateId, order.ShippingTypeId);
+                order.ShippingCost = shippingCost;
+                order.CODAmount = shippingCost;
+           }
+
             order.UpdatedAt = DateTime.UtcNow;
+
+            _unitOfWork.Repository<Order>().Update(order);
 
             await _unitOfWork.CompleteAsync();
         }
@@ -165,6 +174,30 @@ namespace Shipping.Service
             var spec = new OrderSpecifications(parameters);
             spec.AddCriteria(o => o.DeliveryAgentId == deliveryManId);
             return await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(spec);
+        }
+
+        public async Task<decimal> calculateShippingCost(decimal weight, int governateId, int shippingTypeId)
+        {
+            var weightSetting = await _unitOfWork.Repository<WeightSetting>().GetByIdAsync(governateId);
+            if (weightSetting == null) throw new Exception("Weight setting not found.");
+
+            var shippingType = await _unitOfWork.Repository<ShippingType>().GetByIdAsync(shippingTypeId);
+            if (shippingType == null) throw new Exception("Shipping type not found.");
+            var shippingTypeCost = shippingType.AdditionalCost;
+
+            decimal baseWeight = weightSetting.BaseWeight;
+            decimal baseWeightPrice = weightSetting.BaseWeightPrice;
+            decimal additionalWeightPrice = weightSetting.AdditionalWeightPrice;
+            if (weight <= baseWeight)
+            {
+                return baseWeightPrice + shippingTypeCost;
+            }
+            else
+            {
+                decimal additionalWeight = weight - baseWeight;
+                decimal additionalCost = Math.Ceiling(additionalWeight) * additionalWeightPrice;
+                return baseWeightPrice + additionalCost + shippingTypeCost;
+            }
         }
     }
 

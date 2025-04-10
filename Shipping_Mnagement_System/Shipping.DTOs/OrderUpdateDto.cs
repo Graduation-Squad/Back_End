@@ -14,7 +14,6 @@ namespace Shipping.Models
         public decimal? TotalWeight { get; set; }
         public int? PaymentMethodId { get; set; }
         public int? DeliveryOptionId { get; set; }
-        public decimal? CODAmount { get; set; }
         public string Notes { get; set; }
     }
 }
