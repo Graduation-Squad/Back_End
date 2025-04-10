@@ -23,6 +23,22 @@ namespace Shipping.Repository.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // Ensure default Governorate exists
+            modelBuilder.Entity<Governorate>().HasData(
+                new Governorate { Id = 1, Name = "Default Governorate" }
+            );
+
+            // Ensure default City exists (with a valid GovernorateId)
+            modelBuilder.Entity<City>().HasData(
+                new City { Id = 1, Name = "Default City", GovernorateId = 1 }
+            );
+
+            // Ensure default Area exists (with a valid CityId)
+            modelBuilder.Entity<Area>().HasData(
+                new Area { Id = 1, Name = "Default Area", CityId = 1, IsActive = true }
+            );
+
         }
 
         public DbSet<UserGroup> UserGroups { get; set; }
