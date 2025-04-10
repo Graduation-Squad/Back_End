@@ -35,12 +35,16 @@ namespace Shipping.Service
                 UserName = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 EmailConfirmed = true,
-                UserType = UserType.Merchant
+                UserType = UserType.Merchant,
+                Address = dto.Address
             };
 
-            
             var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) return false;
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Merchant creation failed: {errors}");
+            }
 
             await _userManager.AddToRoleAsync(user, "Merchant");
 
@@ -52,20 +56,29 @@ namespace Shipping.Service
                 RejectedOrdersShippingRatio = dto.RejectedOrdersShippingRatio
             };
 
-            _context.Merchants.Add(merchant);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Merchants.Add(merchant);
+                await _context.SaveChangesAsync();
 
-            await _emailService.SendEmailAsync(user.Email, "Your Merchant Account",
-                $"Username: {user.Email}\nPassword: {dto.Password}");
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Your Merchant Account",
+                    $"Username: {user.Email}\nPassword: {dto.Password}");
 
-            return true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                 
+                await _userManager.DeleteAsync(user);
+                throw new Exception($"Failed to complete merchant creation: {ex.Message}");
+            }
         }
 
 
         public async Task<bool> CreateDeliveryManAsync(CreateDeliveryManDto dto)
         {
-            var password = Guid.NewGuid().ToString("N").Substring(0, 8) + "@1";  
-
             var user = new AppUser
             {
                 FullName = dto.FullName,
@@ -74,10 +87,11 @@ namespace Shipping.Service
                 PhoneNumber = dto.PhoneNumber,
                 EmailConfirmed = true,
                 UserType = UserType.DeliveryAgent,
-                Address = dto.Address  
+                Address = dto.Address
             };
 
-            var result = await _userManager.CreateAsync(user, password);
+            
+            var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -86,7 +100,6 @@ namespace Shipping.Service
 
             await _userManager.AddToRoleAsync(user, "DeliveryMan");
 
-            
             if (!Enum.TryParse<DiscountType>(dto.DiscountType, true, out var parsedDiscountType))
             {
                 throw new ArgumentException($"Invalid DiscountType value: {dto.DiscountType}");
@@ -104,9 +117,8 @@ namespace Shipping.Service
             _context.DeliveryMen.Add(deliveryMan);
             await _context.SaveChangesAsync();
 
-            
             await _emailService.SendEmailAsync(user.Email, "Your DeliveryMan Account",
-                $"Username: {user.Email}\nPassword: {password}");
+                $"Username: {user.Email}\nPassword: {dto.Password}");
 
             return true;
         }
