@@ -9,8 +9,8 @@ namespace Shipping.Core.Services.Contracts
 {
     public interface IDashboardService
     {
-        Task<MerchantDashboardDto> GetMerchantDashboardAsync(int merchantId);
-        Task<EmployeeDashboardDto> GetEmployeeDashboardAsync(int employeeId);
+        Task<MerchantDashboardDto> GetMerchantDashboardAsync();
+        Task<EmployeeDashboardDto> GetEmployeeDashboardAsync();
         Task<AdminDashboardDto> GetAdminDashboardAsync();
 
     }

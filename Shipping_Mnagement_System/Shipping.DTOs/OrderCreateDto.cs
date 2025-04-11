@@ -9,8 +9,6 @@ namespace Shipping.Models
 {
     public class OrderCreateDto
     {
-        [Required]
-        public int MerchantId { get; set; }
 
         [Required]
         public int AreaId { get; set; }

@@ -26,7 +26,7 @@ namespace Shipping.Core.Services.Contracts
     {
         Task<Order> GetOrderByIdAsync(int id);
         Task<IReadOnlyList<Order>> GetOrdersAsync(OrderParameters orderParameters);
-        Task<Order> CreateOrderAsync(OrderCreateDto orderCreateDto);
+        Task<Order> CreateOrderAsync(OrderCreateDto dto, string userEmail);
         Task UpdateOrderAsync(int id, OrderUpdateDto orderUpdateDto);
         Task UpdateOrderStatusAsync(int id, OrderStatusUpdateDto statusUpdateDto);
         Task AssignOrderToDeliveryManAsync(int orderId, int deliveryManId);
