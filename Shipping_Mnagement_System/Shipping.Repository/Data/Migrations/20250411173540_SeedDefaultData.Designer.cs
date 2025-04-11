@@ -12,7 +12,7 @@ using Shipping.Repository.Data;
 namespace Shipping.Repository.Data.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    [Migration("20250410172331_SeedDefaultData")]
+    [Migration("20250411173540_SeedDefaultData")]
     partial class SeedDefaultData
     {
         /// <inheritdoc />
@@ -320,7 +320,7 @@ namespace Shipping.Repository.Data.Migrations
                     b.HasIndex("AppUserId")
                         .IsUnique();
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Shipping.Core.DomainModels.Governorate", b =>

@@ -41,6 +41,20 @@ namespace Shipping_APIs.Controllers
             }
         }
 
+        [HttpPost("create-employee")]
+        public async Task<IActionResult> CreateEmployee(CreateEmployeeDto dto)
+        {
+            try
+            {
+                var result = await _adminService.CreateEmployeeAsync(dto);
+                return result ? Ok("Employee created.") : BadRequest("Error creating employee.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"❌ Exception: {ex.Message}");
+            }
+        }
+
 
 
 

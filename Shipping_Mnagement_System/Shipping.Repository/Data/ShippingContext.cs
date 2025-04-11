@@ -55,6 +55,7 @@ namespace Shipping.Repository.Data
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<ShippingType> ShippingTypes { get; set; }
         public DbSet<UserBranch> UserBranches { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
 
 
