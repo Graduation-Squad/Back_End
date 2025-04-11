@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels.OrderModels;
@@ -14,11 +15,13 @@ namespace Shipping_APIs.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public OrderController(IOrderService orderService, IMapper mapper)
+        public OrderController(IOrderService orderService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _orderService = orderService;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -29,11 +32,18 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderDto>> CreateOrder(OrderCreateDto dto)
+        [Authorize(Roles = "Merchant")]
+        public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] OrderCreateDto dto)
         {
-            var order = await _orderService.CreateOrderAsync(dto);
+            var userEmail = _httpContextAccessor.HttpContext.User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userEmail))
+                return Unauthorized("Invalid token.");
+
+            var order = await _orderService.CreateOrderAsync(dto, userEmail);
             return Ok(_mapper.Map<OrderDto>(order));
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDto>> GetById(int id)

@@ -23,6 +23,7 @@ namespace Shipping_APIs
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddHttpContextAccessor();
 
             #region Configure Services
             builder.Services.AddControllers();

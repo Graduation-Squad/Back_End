@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shipping.Repository.Data;
 
@@ -11,9 +12,11 @@ using Shipping.Repository.Data;
 namespace Shipping.Repository.Data.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20250411201644_injectWeight")]
+    partial class injectWeight
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -514,6 +517,9 @@ namespace Shipping.Repository.Data.Migrations
                     b.Property<int?>("DeliveryAgentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<int>("GovernorateId")
                         .HasColumnType("int");
 
@@ -561,6 +567,8 @@ namespace Shipping.Repository.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("DeliveryAgentId");
+
+                    b.HasIndex("EmployeeId");
 
                     b.HasIndex("GovernorateId");
 
@@ -978,7 +986,7 @@ namespace Shipping.Repository.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Shipping.Core.DomainModels.Employee", "CreatedBy")
-                        .WithMany("CreatedOrders")
+                        .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -986,6 +994,10 @@ namespace Shipping.Repository.Data.Migrations
                         .WithMany("AssignedOrders")
                         .HasForeignKey("DeliveryAgentId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Shipping.Core.DomainModels.Employee", null)
+                        .WithMany("CreatedOrders")
+                        .HasForeignKey("EmployeeId");
 
                     b.HasOne("Shipping.Core.DomainModels.Governorate", "Governorate")
                         .WithMany("Orders")

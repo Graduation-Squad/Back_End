@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,16 +26,25 @@ namespace Shipping.Service
         private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
-        public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IConfiguration configuration, RoleManager<IdentityRole> roleManager, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
             _configuration = configuration;
             _roleManager = roleManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
         {
+            // Check if the current user is an admin
+            var currentUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            if (!await _userManager.IsInRoleAsync(currentUser, "Admin"))
+            {
+                throw new UnauthorizedAccessException("You do not have permission to register new users.");
+            }
+
             // Parse string to enum
             if (!Enum.TryParse(request.UserType, out UserType userType))
             {
@@ -108,6 +118,7 @@ namespace Shipping.Service
 
 
 
+
         public async Task<string> LoginAsync(LoginModel model)
         {
             Console.WriteLine($"Login attempt for email: {model.Email}"); // Debug
@@ -135,7 +146,7 @@ namespace Shipping.Service
                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
-            // Add role claims
+            
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));

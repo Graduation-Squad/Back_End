@@ -30,8 +30,8 @@ namespace Shipping.Repository.Data.Identity
 
             
             await CreateUserIfNotExists(userManager, emailService, context, "em468001@gmail.com", "Admin@123", "System Admin", UserType.Admin, "Admin", "Admin Address", "01000000000");
-            await CreateUserIfNotExists(userManager, emailService, context, "merchant@shipping.com", "Merchant@123", "Default Merchant", UserType.Merchant, "Merchant", "Merchant Address", "01000000001");
-            await CreateUserIfNotExists(userManager, emailService, context, "delivery@shipping.com", "Delivery@123", "Default Delivery", UserType.DeliveryAgent, "DeliveryMan", "Delivery Address", "01000000002");
+          //  await CreateUserIfNotExists(userManager, emailService, context, "merchant@shipping.com", "Merchant@123", "Default Merchant", UserType.Merchant, "Merchant", "Merchant Address", "01000000001");
+          //  await CreateUserIfNotExists(userManager, emailService, context, "delivery@shipping.com", "Delivery@123", "Default Delivery", UserType.DeliveryAgent, "DeliveryMan", "Delivery Address", "01000000002");
         }
 
        
