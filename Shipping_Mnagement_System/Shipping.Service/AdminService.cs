@@ -123,7 +123,43 @@ namespace Shipping.Service
             return true;
         }
 
+        public async Task<bool> CreateEmployeeAsync(CreateEmployeeDto dto)
+        {
+            var user = new AppUser
+            {
+                FullName = dto.FullName,
+                Email = dto.Email,
+                UserName = dto.Email,
+                PhoneNumber = dto.PhoneNumber,
+                EmailConfirmed = true,
+                UserType = UserType.Employee,
+                Address = dto.Address
+            };
 
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"User creation failed: {errors}");
+            }
+
+            await _userManager.AddToRoleAsync(user, "Employee");
+
+            var employee = new Employee
+            {
+                AppUserId = user.Id,
+                EmployeeCode = dto.EmployeeCode,
+                Department = dto.Department
+            };
+
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
+
+            await _emailService.SendEmailAsync(user.Email, "Your Employee Account",
+                $"Username: {user.Email}\nPassword: {dto.Password}");
+
+            return true;
+        }
 
     }
 

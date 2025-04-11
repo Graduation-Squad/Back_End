@@ -11,6 +11,8 @@ namespace Shipping.Core.Services.Contracts
     {
         Task<bool> CreateMerchantAsync(CreateMerchantDto dto);
         Task<bool> CreateDeliveryManAsync(CreateDeliveryManDto dto);
+        Task<bool> CreateEmployeeAsync(CreateEmployeeDto dto);
+
     }
 
 }

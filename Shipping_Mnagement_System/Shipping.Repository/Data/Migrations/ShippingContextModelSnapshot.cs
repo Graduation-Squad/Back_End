@@ -317,7 +317,7 @@ namespace Shipping.Repository.Data.Migrations
                     b.HasIndex("AppUserId")
                         .IsUnique();
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Shipping.Core.DomainModels.Governorate", b =>
