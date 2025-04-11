@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Core.Repositories.Contracts
 {
-    public interface IGenericRepository<T> where T : BaseModel
+    public interface IGenericRepository<T> where T : class //BaseModel
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);

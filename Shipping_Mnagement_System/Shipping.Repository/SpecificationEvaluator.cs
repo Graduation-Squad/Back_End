@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Repository
 {
-    public static class SpecificationEvaluator<T> where T : BaseModel
+    public static class SpecificationEvaluator<T> where T : class //BaseModel
     {
         public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> spec)
         {

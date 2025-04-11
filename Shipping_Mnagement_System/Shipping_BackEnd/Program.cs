@@ -189,7 +189,8 @@ namespace Shipping_APIs
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 var emailService = services.GetRequiredService<IEmailService>();
-                await IdentitySeedData.Initialize(roleManager, userManager, emailService, services.GetRequiredService<ShippingContext>());
+                var unitOfWork = services.GetRequiredService<IUnitOfWork>();
+                await IdentitySeedData.Initialize(roleManager, userManager, emailService, services.GetRequiredService<ShippingContext>(), unitOfWork);
 
 
             }
@@ -214,7 +215,8 @@ namespace Shipping_APIs
             //app.UseStatusCodePages();
 
             app.UseHttpsRedirection(); 
-            app.UseAuthentication();  
+            app.UseAuthentication();
+            app.UseMiddleware<PermissionMiddleware>();
             app.UseAuthorization();   
             app.MapControllers(); 
             #endregion

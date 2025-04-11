@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels;
+using Shipping.Core.Permissions;
 using Shipping.Core.Services.Contracts;
+using Shipping_APIs.Attributes;
 
 namespace Shipping_APIs.Controllers
 {
@@ -17,6 +19,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet]
+        [Permission(Permissions.Locations.ViewAreas)]
         public async Task<IActionResult> GetAllAreas()
         {
             var areas = await _areaService.GetAllAreasAsync();

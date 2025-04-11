@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Core.Specification
 {
-    public class Specification<T> : ISpecification<T> where T : BaseModel
+    public class Specification<T> : ISpecification<T> where T :class// BaseModel
     {
         public Expression<Func<T, bool>> Criteria { get; set; }
         public List<Expression<Func<T, object>>> Includes { get; set; } = new List<Expression<Func<T, object>>>();

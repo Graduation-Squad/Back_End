@@ -9,6 +9,7 @@ using Shipping.Core.DomainModels.Identity;
 using Shipping.Core.Enums;
 using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Services.Contracts;
+using Shipping.Core.Specification;
 using Shipping.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -115,10 +116,6 @@ namespace Shipping.Service
                 UserType = userType.ToString()
             };
         }
-
-
-
-
         public async Task<string> LoginAsync(LoginModel model)
         {
             Console.WriteLine($"Login attempt for email: {model.Email}"); // Debug
@@ -168,6 +165,15 @@ namespace Shipping.Service
 
             return tokenHandler.WriteToken(token);
         }
+        public async Task<bool> HasPermissionAsync(string userId, string permissionName)
+        {
+            var user = await _unitOfWork.Repository<AppUser>()
+                .GetWithSpecAsync(new UserWithUserGroupAndPermissionsSpec(userId));
 
+            if (user?.UserGroup == null) return false;
+
+            return user.UserGroup.UserGroupPermissions
+                .Any(ugp => ugp.Permission.Name.Equals(permissionName, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Shipping.Repository
             AppUsers = appUserRepository;  
         }
 
-        public IGenericRepository<T> Repository<T>() where T : BaseModel
+        public IGenericRepository<T> Repository<T>() where T :class// BaseModel
         {
             var type = typeof(T);
             if (!_repositories.ContainsKey(type))

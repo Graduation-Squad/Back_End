@@ -9,8 +9,8 @@ namespace Shipping.Core.Repositories.Contracts
 {
     public interface IUnitOfWork: IDisposable
     {
-        IAppUserRepository AppUsers { get; }   
-        IGenericRepository<T> Repository<T>() where T : BaseModel;
+        IAppUserRepository AppUsers { get; }
+        IGenericRepository<T> Repository<T>() where T : class;//BaseModel;
         Task<int> CompleteAsync();
     }
 

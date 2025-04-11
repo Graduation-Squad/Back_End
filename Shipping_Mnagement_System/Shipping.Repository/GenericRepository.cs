@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Shipping.Repository
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : BaseModel
+    public class GenericRepository<T> : IGenericRepository<T> where T : class //BaseModel
     {
         private readonly ShippingContext _context;
         private readonly DbSet<T> _dbSet;
