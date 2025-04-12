@@ -52,7 +52,7 @@ namespace Shipping.Repository.Data.Configurations
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.CreatedBy)
-                   .WithMany()
+                   .WithMany(e => e.CreatedOrders)
                    .HasForeignKey(o => o.CreatedById)
                    .OnDelete(DeleteBehavior.Restrict);
 

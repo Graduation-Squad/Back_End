@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Core.Permissions;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;
+using Shipping_APIs.Attributes;
 using Shipping_APIs.Errors;
 
 namespace Shipping_APIs.Controllers
@@ -19,13 +20,13 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("merchant")]
-        //[Authorize(Roles = "Merchant")]
+        [Permission(Permissions.Dashboard.ViewMerchant)]
+        [Authorize(Roles = "Merchant")]
         public async Task<ActionResult<MerchantDashboardDto>> GetMerchantDashboard()
         {
-            var merchantId = 1; // Replace with actual merchant ID from the token or context
             try
             {
-                var result = await _dashboardService.GetMerchantDashboardAsync(merchantId);
+                var result = await _dashboardService.GetMerchantDashboardAsync();
                 return Ok(result);
             }
             catch (Exception ex)
@@ -35,24 +36,24 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("employee")]
-        //[Authorize(Roles = "Employee")]
+        [Permission(Permissions.Dashboard.ViewEmployee)]
+        [Authorize(Roles = "Employee")]
         public async Task<ActionResult<EmployeeDashboardDto>> GetEmployeeDashboard()
         {
             try
             {
-                var employeeId = 1;
-                var result = await _dashboardService.GetEmployeeDashboardAsync(employeeId);
+                var result = await _dashboardService.GetEmployeeDashboardAsync();
                 return Ok(result);
             }
             catch (Exception ex)
             {
                 return BadRequest(new ApiErrorResponse(400, ex.Message));
             }
-           
         }
 
         [HttpGet("admin")]
-        //[Authorize(Roles = "Admin")]
+        [Permission(Permissions.Dashboard.ViewAdmin)]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AdminDashboardDto>> GetAdminDashboard()
         {
             try
@@ -65,6 +66,5 @@ namespace Shipping_APIs.Controllers
                 return BadRequest(new ApiErrorResponse(400, ex.Message));
             }
         }
-
     }
 }

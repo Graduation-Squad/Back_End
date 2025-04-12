@@ -12,8 +12,8 @@ using Shipping.Repository.Data;
 namespace Shipping.Repository.Data.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    [Migration("20250410172331_SeedDefaultData")]
-    partial class SeedDefaultData
+    [Migration("20250411201644_injectWeight")]
+    partial class injectWeight
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -320,7 +320,7 @@ namespace Shipping.Repository.Data.Migrations
                     b.HasIndex("AppUserId")
                         .IsUnique();
 
-                    b.ToTable("Employee");
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Shipping.Core.DomainModels.Governorate", b =>
@@ -828,7 +828,7 @@ namespace Shipping.Repository.Data.Migrations
 
                     b.HasIndex("GovernorateId");
 
-                    b.ToTable("WeightSetting");
+                    b.ToTable("WeightSettings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

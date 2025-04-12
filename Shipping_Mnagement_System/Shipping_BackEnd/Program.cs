@@ -23,6 +23,7 @@ namespace Shipping_APIs
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddHttpContextAccessor();
 
             #region Configure Services
             builder.Services.AddControllers();
@@ -112,6 +113,11 @@ namespace Shipping_APIs
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            builder.Services.AddScoped<IShippingTypeService, ShippingTypeService>();
+            builder.Services.AddScoped<IRejectionReasonService, RejectionReasonService>();
+            builder.Services.AddScoped<IWeightSettingService, WeightSettingService>();
 
 
             // ? AutoMapper Configuration
@@ -188,7 +194,8 @@ namespace Shipping_APIs
                 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
                 var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 var emailService = services.GetRequiredService<IEmailService>();
-                await IdentitySeedData.Initialize(roleManager, userManager, emailService, services.GetRequiredService<ShippingContext>());
+                var unitOfWork = services.GetRequiredService<IUnitOfWork>();
+                await IdentitySeedData.Initialize(roleManager, userManager, emailService, services.GetRequiredService<ShippingContext>(), unitOfWork);
 
 
             }
@@ -213,7 +220,8 @@ namespace Shipping_APIs
             //app.UseStatusCodePages();
 
             app.UseHttpsRedirection(); 
-            app.UseAuthentication();  
+            app.UseAuthentication();
+            app.UseMiddleware<PermissionMiddleware>();
             app.UseAuthorization();   
             app.MapControllers(); 
             #endregion

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Core.Permissions;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;
+using Shipping_APIs.Attributes;
 
 namespace Shipping_APIs.Controllers
 {
@@ -19,6 +21,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost("create-merchant")]
+        [Permission(Permissions.Users.Create)]
         public async Task<IActionResult> CreateMerchant(CreateMerchantDto dto)
         {
             var result = await _adminService.CreateMerchantAsync(dto);
@@ -28,6 +31,7 @@ namespace Shipping_APIs.Controllers
          
 
         [HttpPost("create-deliveryman")]
+        [Permission(Permissions.Users.Create)]
         public async Task<IActionResult> CreateDeliveryMan(CreateDeliveryManDto dto)
         {
             try
@@ -38,6 +42,21 @@ namespace Shipping_APIs.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"❌ Exception: {ex.Message}");  
+            }
+        }
+
+        [HttpPost("create-employee")]
+        [Permission(Permissions.Users.Create)]
+        public async Task<IActionResult> CreateEmployee(CreateEmployeeDto dto)
+        {
+            try
+            {
+                var result = await _adminService.CreateEmployeeAsync(dto);
+                return result ? Ok("Employee created.") : BadRequest("Error creating employee.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"❌ Exception: {ex.Message}");
             }
         }
 

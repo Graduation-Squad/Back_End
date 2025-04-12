@@ -12,5 +12,6 @@ namespace Shipping.Core.Services.Contracts
     {
         Task<RegisterResponse> RegisterAsync(RegisterRequest request);
         Task<string> LoginAsync(LoginModel model);
+        Task<bool> HasPermissionAsync(string userId, string permissionName);
     }
 }

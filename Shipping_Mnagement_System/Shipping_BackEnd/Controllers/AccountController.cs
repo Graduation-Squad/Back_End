@@ -24,7 +24,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost("register")]
-        //[Authorize(Roles = "Admin")]  // Only Admin can access this endpoint
+        [Authorize(Roles = "Admin")]  
         public async Task<ActionResult> Register(RegisterRequest model)
         {
             try
@@ -44,17 +44,18 @@ namespace Shipping_APIs.Controllers
             try
             {
                 var token = await _userService.LoginAsync(model);
-                return Ok(new { Token = token });
+                return Ok(new { Token = token });  
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(new ApiErrorResponse(401, ex.Message));
+                return Unauthorized(new ApiErrorResponse(401, ex.Message));  
             }
             catch (Exception ex)
             {
-                return BadRequest(new ApiErrorResponse(400, ex.Message));
+                return BadRequest(new ApiErrorResponse(400, ex.Message));  
             }
         }
+
 
 
     }

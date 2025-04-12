@@ -78,13 +78,29 @@ namespace Shipping.Service
             return await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(spec);
         }
 
-        public async Task<Order> CreateOrderAsync(OrderCreateDto dto)
+        public async Task<Order> CreateOrderAsync(OrderCreateDto dto, string userEmail)
         {
-            decimal shippingCost = await calculateShippingCost(dto.TotalWeight, dto.GovernorateId, dto.DeliveryOptionId, dto.IsVillageDelivery);
+            if (string.IsNullOrWhiteSpace(userEmail))
+                throw new Exception("User email is missing or invalid.");
+
+            
+            var merchant = await _unitOfWork.Repository<Merchant>()
+                .SingleOrDefaultAsync(m => m.AppUser.Email == userEmail);
+
+            if (merchant == null)
+                throw new Exception("Merchant not found.");
+
+            decimal shippingCost = await calculateShippingCost(
+                dto.TotalWeight,
+                dto.GovernorateId,
+                dto.DeliveryOptionId,
+                dto.IsVillageDelivery
+            );
+
             var order = new Order
             {
-                OrderNumber = Guid.NewGuid().ToString().Substring(0, 8),
-                MerchantId = dto.MerchantId,
+                OrderNumber = Guid.NewGuid().ToString("N").Substring(0, 8), 
+                MerchantId = merchant.Id,
                 AreaId = dto.AreaId,
                 CityId = dto.CityId,
                 GovernorateId = dto.GovernorateId,
@@ -94,7 +110,7 @@ namespace Shipping.Service
                 TotalWeight = dto.TotalWeight,
                 ShippingCost = shippingCost,
                 CODAmount = shippingCost,
-                Notes = dto.Notes,
+                Notes = dto.Notes
             };
 
             await _unitOfWork.Repository<Order>().AddAsync(order);
@@ -102,6 +118,9 @@ namespace Shipping.Service
 
             return order;
         }
+
+
+
 
         public async Task<Order> GetOrderByIdAsync(int id)
         {
@@ -179,18 +198,25 @@ namespace Shipping.Service
 
         public async Task<decimal> calculateShippingCost(decimal weight, int governateId, int shippingTypeId, bool IsVillageDelivery)
         {
-            decimal villageExtra = IsVillageDelivery is true ? 10 : 0;
+            decimal villageExtra = IsVillageDelivery ? 10 : 0;
 
             var weightSetting = await _unitOfWork.Repository<WeightSetting>().GetByIdAsync(governateId);
-            if (weightSetting == null) throw new Exception("Weight setting not found.");
+            if (weightSetting == null)
+            {
+                throw new Exception($"Weight setting for governorate ID {governateId} not found.");
+            }
 
             var shippingType = await _unitOfWork.Repository<ShippingType>().GetByIdAsync(shippingTypeId);
-            if (shippingType == null) throw new Exception("Shipping type not found.");
+            if (shippingType == null)
+            {
+                throw new Exception("Shipping type not found.");
+            }
             var shippingTypeCost = shippingType.AdditionalCost;
 
             decimal baseWeight = weightSetting.BaseWeight;
             decimal baseWeightPrice = weightSetting.BaseWeightPrice;
             decimal additionalWeightPrice = weightSetting.AdditionalWeightPrice;
+
             if (weight <= baseWeight)
             {
                 return baseWeightPrice + shippingTypeCost + villageExtra;
@@ -202,6 +228,7 @@ namespace Shipping.Service
                 return baseWeightPrice + additionalCost + shippingTypeCost + villageExtra;
             }
         }
+
     }
 
 }
