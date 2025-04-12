@@ -140,14 +140,13 @@ namespace Shipping_APIs
             });
             #endregion
 
-            #region JWT Authentication
+            #region JWT Authentication with Custom Events
             var jwtKey = builder.Configuration["JwtSettings:Key"];
             if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 16)
             {
                 throw new ArgumentNullException(nameof(jwtKey), "JWT Key is missing or too short in configuration.");
             }
 
-            Console.WriteLine($"Loaded JWT Key: {jwtKey}"); // Debugging
             var key = Encoding.UTF8.GetBytes(jwtKey);
 
             builder.Services.AddAuthentication(options =>
@@ -168,6 +167,23 @@ namespace Shipping_APIs
                     ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
                     ValidAudience = builder.Configuration["JwtSettings:Audience"],
                     ValidateLifetime = true
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+                        return context.Response.WriteAsync("{\"message\": \"? You are not authorized. Please login.\"}");
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                        context.Response.ContentType = "application/json";
+                        return context.Response.WriteAsync("{\"message\": \"?? Access denied. You don't have the required permission for this action.\"}");
+                    }
                 };
             });
             #endregion
@@ -213,7 +229,13 @@ namespace Shipping_APIs
             {
                 app.MapOpenApi();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShippingSys.APIs v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShippingSys.APIs v1");
+
+                    // This makes Swagger store the token and apply it to each request
+                    c.ConfigObject.AdditionalItems["persistAuthorization"] = true;
+                });
             }
 
             app.UseStatusCodePagesWithRedirects("/errors/{0}"); 
