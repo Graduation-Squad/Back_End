@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.Services.Contracts;
 using Shipping.Core.Specification;
@@ -7,6 +8,7 @@ namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin, Employee")]
     public class ReportController : ControllerBase
     {
         private readonly IReportService _reportService;

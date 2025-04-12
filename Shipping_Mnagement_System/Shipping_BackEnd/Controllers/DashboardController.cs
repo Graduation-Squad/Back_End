@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Core.Permissions;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;
+using Shipping_APIs.Attributes;
 using Shipping_APIs.Errors;
 
 namespace Shipping_APIs.Controllers
@@ -18,6 +20,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("merchant")]
+        [Permission(Permissions.Dashboard.ViewMerchant)]
         [Authorize(Roles = "Merchant")]
         public async Task<ActionResult<MerchantDashboardDto>> GetMerchantDashboard()
         {
@@ -33,6 +36,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("employee")]
+        [Permission(Permissions.Dashboard.ViewEmployee)]
         [Authorize(Roles = "Employee")]
         public async Task<ActionResult<EmployeeDashboardDto>> GetEmployeeDashboard()
         {
@@ -48,6 +52,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("admin")]
+        [Permission(Permissions.Dashboard.ViewAdmin)]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AdminDashboardDto>> GetAdminDashboard()
         {

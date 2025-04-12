@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels;
+using Shipping.Core.Permissions;
 using Shipping.Core.Services.Contracts;
+using Shipping_APIs.Attributes;
 
 namespace Shipping_APIs.Controllers
 {
@@ -17,6 +19,8 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet]
+        [Permission(Permissions.Locations.ViewCities)]
+
         public async Task<IActionResult> GetAllCities()
         {
             var cities = await _cityService.GetAllCitiesAsync();
@@ -24,6 +28,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("{id}")]
+        [Permission(Permissions.Locations.ViewCities)]
         public async Task<IActionResult> GetCityById(int id)
         {
             var city = await _cityService.GetCityByIdAsync(id);
@@ -32,6 +37,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
+        [Permission(Permissions.Locations.ManageCities)]
         public async Task<IActionResult> CreateCity([FromBody] City city)
         {
             if (city == null) return BadRequest("Invalid data");
@@ -43,6 +49,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}")]
+        [Permission(Permissions.Locations.ManageCities)]
         public async Task<IActionResult> UpdateCity(int id, [FromBody] City updatedCity)
         {
             if (updatedCity == null) return BadRequest("Invalid data");
@@ -54,6 +61,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}/status")]
+        [Permission(Permissions.Locations.ManageCities)]
         public async Task<IActionResult> ToggleCityStatus(int id)
         {
             var result = await _cityService.ToggleCityStatusAsync(id);
@@ -63,6 +71,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Permission(Permissions.Locations.ManageCities)]
         public async Task<IActionResult> DeleteCity(int id)
         {
             var result = await _cityService.DeleteCityAsync(id);
@@ -71,6 +80,7 @@ namespace Shipping_APIs.Controllers
             return NoContent();
         }
         [HttpGet("by-governorate/{governorateId}")]
+        [Permission(Permissions.Locations.ViewCities)]
         public async Task<IActionResult> GetCitiesByGovernorate(int governorateId)
         {
             var cities = await _cityService.GetCitiesByGovernorateIdAsync(governorateId);

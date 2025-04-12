@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels.OrderModels;
 using Shipping.Core.Services.Contracts;
@@ -7,6 +8,7 @@ namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class PaymentMethodController : ControllerBase
     {
         private readonly IPaymentMethodService _service;

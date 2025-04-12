@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels;
+using Shipping.Core.Permissions;
 using Shipping.Core.Services.Contracts;
+using Shipping_APIs.Attributes;
 
 namespace Shipping_APIs.Controllers
 {
@@ -17,6 +19,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet]
+        [Permission(Permissions.Locations.ViewGovernorates)]
         public async Task<IActionResult> GetAllGovernorates()
         {
             var governorates = await _governorateService.GetAllGovernoratesAsync();
@@ -24,6 +27,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("{id}")]
+        [Permission(Permissions.Locations.ViewGovernorates)]
         public async Task<IActionResult> GetGovernorateById(int id)
         {
             var governorate = await _governorateService.GetGovernorateByIdAsync(id);
@@ -32,6 +36,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
+        [Permission(Permissions.Locations.ManageGovernorates)]
         public async Task<IActionResult> CreateGovernorate([FromBody] Governorate governorate)
         {
             var createdGovernorate = await _governorateService.CreateGovernorateAsync(governorate);
@@ -39,6 +44,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}")]
+        [Permission(Permissions.Locations.ManageGovernorates)]
         public async Task<IActionResult> UpdateGovernorate(int id, [FromBody] Governorate governorate)
         {
             if (id != governorate.Id) return BadRequest("ID mismatch");
@@ -47,18 +53,21 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}/status")]
+        [Permission(Permissions.Locations.ManageGovernorates)]
         public async Task<IActionResult> ActivateDeactivateGovernorate(int id)
         {
             await _governorateService.ActivateDeactivateGovernorateAsync(id);
             return NoContent();
         }
         [HttpDelete("{id}")]
+        [Permission(Permissions.Locations.ManageGovernorates)]
         public async Task<IActionResult> DeleteGovernorate(int id)
         {
             await _governorateService.DeleteGovernorateAsync(id);
             return NoContent();
         }
         [HttpGet("{id}/cities")]
+        [Permission(Permissions.Locations.ViewGovernorates)]
         public async Task<IActionResult> GetCitiesByGovernorateId(int id)
         {
             var cities = await _governorateService.GetCitiesByGovernorateIdAsync(id);

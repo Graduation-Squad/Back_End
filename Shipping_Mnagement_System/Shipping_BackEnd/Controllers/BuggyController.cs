@@ -9,6 +9,7 @@ namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class BuggyController : ControllerBase
     {
         private readonly ShippingContext _shippingContext;
