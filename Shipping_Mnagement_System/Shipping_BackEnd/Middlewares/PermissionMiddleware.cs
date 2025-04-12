@@ -23,14 +23,28 @@ namespace Shipping_APIs.Middlewares
                 var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null)
                 {
+                    context.Response.ContentType = "application/json";
                     context.Response.StatusCode = 401;
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        StatusCode = 401,
+                        Message = "Unauthorized. User ID not found."
+                    });
                     return;
                 }
 
                 var hasPermission = await userService.HasPermissionAsync(userId, permissionAttribute.Permission);
                 if (!hasPermission)
                 {
+                    context.Response.ContentType = "application/json";
                     context.Response.StatusCode = 403;
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        StatusCode = 403,
+                        Message = "You do not have permission to access this resource.",
+                        RequiredPermission = permissionAttribute.Permission
+                    });
+
                     return;
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shipping.Core.DomainModels;
+using Shipping.Core.DomainModels.Identity;
 using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Specification;
 using Shipping.Repository.Data;
@@ -34,7 +35,15 @@ namespace Shipping.Repository
             return await _dbSet.FindAsync(id);
         }
 
-        
+        public async Task<T?> GetByIdAsync(string id)
+        {
+            return await _dbSet.Include(u => (u as AppUser).UserGroup)
+                                   .ThenInclude(ug => ug.UserGroupPermissions)
+                                   .ThenInclude(ugp => ugp.Permission)
+                                   .FirstOrDefaultAsync(u => (u as AppUser).Id == id);
+        }
+
+
         public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);

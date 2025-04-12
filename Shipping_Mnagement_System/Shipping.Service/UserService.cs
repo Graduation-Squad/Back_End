@@ -168,7 +168,7 @@ namespace Shipping.Service
         public async Task<bool> HasPermissionAsync(string userId, string permissionName)
         {
             var user = await _unitOfWork.Repository<AppUser>()
-                .GetWithSpecAsync(new UserWithUserGroupAndPermissionsSpec(userId));
+                .GetByIdAsync(userId);
 
             if (user?.UserGroup == null) return false;
 

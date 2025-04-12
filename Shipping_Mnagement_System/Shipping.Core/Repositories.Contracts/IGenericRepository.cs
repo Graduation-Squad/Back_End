@@ -11,6 +11,7 @@ namespace Shipping.Core.Repositories.Contracts
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
+        Task<T?> GetByIdAsync(string id);
         Task AddAsync(T entity);
         void Update(T entity);
         void Delete(T entity);
