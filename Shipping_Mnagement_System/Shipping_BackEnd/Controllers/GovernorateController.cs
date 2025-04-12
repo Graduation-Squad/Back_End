@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels;
 using Shipping.Core.Services.Contracts;
+using Shipping.Models;
 
 namespace Shipping_APIs.Controllers
 {
@@ -32,17 +33,16 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGovernorate([FromBody] Governorate governorate)
+        public async Task<IActionResult> CreateGovernorate([FromBody] GovernorateDTO governorate)
         {
             var createdGovernorate = await _governorateService.CreateGovernorateAsync(governorate);
             return CreatedAtAction(nameof(GetGovernorateById), new { id = createdGovernorate.Id }, createdGovernorate);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGovernorate(int id, [FromBody] Governorate governorate)
+        public async Task<IActionResult> UpdateGovernorate(int id, [FromBody] GovernorateDTO governorate)
         {
-            if (id != governorate.Id) return BadRequest("ID mismatch");
-            await _governorateService.UpdateGovernorateAsync(governorate);
+            await _governorateService.UpdateGovernorateAsync(id,governorate);
             return NoContent();
         }
 

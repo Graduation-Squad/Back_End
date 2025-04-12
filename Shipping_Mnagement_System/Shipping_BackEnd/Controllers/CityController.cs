@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels;
 using Shipping.Core.Services.Contracts;
+using Shipping.Models;
 
 namespace Shipping_APIs.Controllers
 {
@@ -32,22 +33,18 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCity([FromBody] City city)
+        public async Task<IActionResult> CreateCity([FromBody] CityDTO city)
         {
             if (city == null) return BadRequest("Invalid data");
-
-            city.Governorate = null;
 
             var newCity = await _cityService.CreateCityAsync(city);
             return CreatedAtAction(nameof(GetCityById), new { id = newCity.Id }, newCity);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCity(int id, [FromBody] City updatedCity)
+        public async Task<IActionResult> UpdateCity(int id, [FromBody] CityDTO updatedCity)
         {
             if (updatedCity == null) return BadRequest("Invalid data");
-
-            updatedCity.Governorate = null;
 
             var city = await _cityService.UpdateCityAsync(id, updatedCity);
             return Ok(city);

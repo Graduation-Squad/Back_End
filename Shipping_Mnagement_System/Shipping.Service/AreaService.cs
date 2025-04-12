@@ -1,6 +1,7 @@
 ﻿using Shipping.Core.DomainModels;
 using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Services.Contracts;
+using Shipping.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,16 +34,23 @@ namespace Shipping.Service
             return await _unitOfWork.Repository<Area>().FindAsync(a => a.CityId == cityId);
         }
 
-        public async Task<Area> CreateAreaAsync(Area area)
+        public async Task<Area> CreateAreaAsync(AreaDTO area)
         {
-            await _unitOfWork.Repository<Area>().AddAsync(area);
+            Area NewArea = new Area()
+            {
+                Name = area.Name,
+                IsActive = area.IsActive,
+                CityId = area.CityId
+            };
+
+            await _unitOfWork.Repository<Area>().AddAsync(NewArea);
             await _unitOfWork.CompleteAsync();
-            return area;
+            return NewArea;
         }
 
-        public async Task<Area> UpdateAreaAsync(int id, Area updatedArea)
+        public async Task<Area> UpdateAreaAsync(int id, AreaDTO updatedArea)
         {
-            var area = await _unitOfWork.Repository<Area>().GetByIdAsync(id);
+            Area area = await _unitOfWork.Repository<Area>().GetByIdAsync(id);
             if (area == null) throw new Exception("Area not found");
 
             area.Name = updatedArea.Name;

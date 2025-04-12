@@ -1,6 +1,7 @@
 ﻿using Shipping.Core.DomainModels;
 using Shipping.Core.Repositories.Contracts;
 using Shipping.Core.Services.Contracts;
+using Shipping.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,18 +29,23 @@ namespace Shipping.Service
             return await _unitOfWork.Repository<City>().GetByIdAsync(id);
         }
 
-        public async Task<City> CreateCityAsync(City city)
+        public async Task<City> CreateCityAsync(CityDTO city)
         {
-            city.Governorate = null;
+            City NewCity = new City()
+            {
+                Name = city.Name,
+                IsActive = city.IsActive,
+                GovernorateId = city.GovernorateId
+            };
 
-            await _unitOfWork.Repository<City>().AddAsync(city);
+            await _unitOfWork.Repository<City>().AddAsync(NewCity);
             await _unitOfWork.CompleteAsync();
-            return city;
+            return NewCity;
         }
 
-        public async Task<City> UpdateCityAsync(int id, City updatedCity)
+        public async Task<City> UpdateCityAsync(int id, CityDTO updatedCity)
         {
-            var city = await _unitOfWork.Repository<City>().GetByIdAsync(id);
+            City city = await _unitOfWork.Repository<City>().GetByIdAsync(id);
             if (city == null) throw new Exception("City not found");
 
             city.Name = updatedCity.Name;

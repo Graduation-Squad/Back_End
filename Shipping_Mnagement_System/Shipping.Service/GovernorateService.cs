@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shipping.Core.Repositories.Contracts;
+using Shipping.Models;
 
 namespace Shipping.Service
 {
@@ -29,18 +30,35 @@ namespace Shipping.Service
             return await _unitOfWork.Repository<Governorate>().GetByIdAsync(id);
         }
 
-        public async Task<Governorate> CreateGovernorateAsync(Governorate governorate)
+        public async Task<Governorate> CreateGovernorateAsync(GovernorateDTO governorate)
         {
-            await _unitOfWork.Repository<Governorate>().AddAsync(governorate);
+            Governorate NewGovernorate = new Governorate
+            {
+                Name = governorate.Name,
+                IsActive = governorate.IsActive
+            };
+
+            await _unitOfWork.Repository<Governorate>().AddAsync(NewGovernorate);
             await _unitOfWork.CompleteAsync();
-            return governorate;
+
+            return NewGovernorate;
         }
 
-        public async Task UpdateGovernorateAsync(Governorate governorate)
+        public async Task UpdateGovernorateAsync(int id ,GovernorateDTO governorate)
         {
-            _unitOfWork.Repository<Governorate>().Update(governorate);
+            Governorate o_governorate = await _unitOfWork.Repository<Governorate>().GetByIdAsync(id);
+           
+            if (governorate == null)
+                throw new Exception("Governorate not found"); ;
+
+
+            o_governorate.Name = governorate.Name;
+            o_governorate.IsActive = governorate.IsActive;
+
+            _unitOfWork.Repository<Governorate>().Update(o_governorate);
             await _unitOfWork.CompleteAsync();
         }
+
 
         public async Task ActivateDeactivateGovernorateAsync(int id)
         {

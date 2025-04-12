@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.DomainModels;
 using Shipping.Core.Services.Contracts;
+using Shipping.Models;
 
 namespace Shipping_APIs.Controllers
 {
@@ -39,7 +40,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateArea([FromBody] Area area)
+        public async Task<IActionResult> CreateArea([FromBody] AreaDTO area)
         {
             if (area == null) return BadRequest("Invalid data");
 
@@ -48,7 +49,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateArea(int id, [FromBody] Area updatedArea)
+        public async Task<IActionResult> UpdateArea(int id, [FromBody] AreaDTO updatedArea)
         {
             var area = await _areaService.UpdateAreaAsync(id, updatedArea);
             return Ok(area);
