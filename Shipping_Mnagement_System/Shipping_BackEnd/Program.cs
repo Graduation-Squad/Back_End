@@ -113,6 +113,11 @@ namespace Shipping_APIs
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+            builder.Services.AddScoped<IShippingTypeService, ShippingTypeService>();
+            builder.Services.AddScoped<IRejectionReasonService, RejectionReasonService>();
+            builder.Services.AddScoped<IWeightSettingService, WeightSettingService>();
 
 
             // ? AutoMapper Configuration

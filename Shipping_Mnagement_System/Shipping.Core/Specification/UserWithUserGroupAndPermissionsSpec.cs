@@ -1,4 +1,5 @@
-﻿using Shipping.Core.DomainModels.Identity;
+﻿using Shipping.Core.DomainModels;
+using Shipping.Core.DomainModels.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,7 @@ namespace Shipping.Core.Specification
     {
         public UserWithUserGroupAndPermissionsSpec(string userId) : base(x => x.Id == userId)
         {
-            AddInclude(x => x.UserGroup);
-            AddInclude(x => x.UserGroup.UserGroupPermissions);
-            AddInclude(x => x.UserGroup.UserGroupPermissions.Select(y => y.Permission));
+            //AddInclude("UserGroup.UserGroupPermissions.Permission");
         }
     }
 }
