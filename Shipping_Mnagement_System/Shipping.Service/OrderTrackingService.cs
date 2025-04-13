@@ -7,6 +7,7 @@ using Shipping.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Shipping.Service
@@ -21,13 +22,26 @@ namespace Shipping.Service
         }
 
         // Get tracking history for an order
-        public async Task<List<OrderTrackingDto>> GetTrackingHistoryAsync(int orderId)
+        public async Task<List<OrderTrackingDto>> GetTrackingHistoryAsync(int orderId, ClaimsPrincipal user)
         {
+            var userEmail = user.FindFirstValue(ClaimTypes.Email);
+            var userRole = user.FindFirstValue(ClaimTypes.Role);
+
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userRole))
+                throw new UnauthorizedAccessException("Invalid token.");
+
             var spec = new OrderWithTrackingSpecification(orderId);
             var order = await _unitOfWork.Repository<Order>().GetWithSpecAsync(spec);
+            if (order == null) throw new Exception("Order not found.");
 
-            if (order == null) return new List<OrderTrackingDto>();
+            // Role-based logic
+            if (userRole == "Merchant" && order.Merchant.AppUser.Email != userEmail)
+                throw new UnauthorizedAccessException("You can only view your own orders.");
 
+            if (userRole == "DeliveryMan" && order.DeliveryAgent.AppUser.Email != userEmail)
+                throw new UnauthorizedAccessException("You can only view orders assigned to you.");
+
+            // Admin or Employee can access any
             return order.OrderTrackings.OrderBy(t => t.Timestamp).Select(t => new OrderTrackingDto
             {
                 Status = t.Status.ToString(),
@@ -38,6 +52,7 @@ namespace Shipping.Service
                 Timestamp = t.Timestamp
             }).ToList();
         }
+
 
         // Add a tracking entry for an order
         public async Task AddTrackingEntryAsync(int orderId, CreateOrderTrackingDto dto, string userId)

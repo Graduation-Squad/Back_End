@@ -8,7 +8,7 @@ namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    
     public class PaymentMethodController : ControllerBase
     {
         private readonly IPaymentMethodService _service;
@@ -19,10 +19,12 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Merchant")]
         public async Task<IActionResult> GetAll() =>
             Ok(await _service.GetAllAsync());
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Merchant")]
         public async Task<IActionResult> Get(int id)
         {
             var method = await _service.GetByIdAsync(id);
@@ -30,6 +32,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(PaymentMethod method)
         {
             var created = await _service.CreateAsync(method);
@@ -37,6 +40,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, PaymentMethod updated)
         {
             try
@@ -51,6 +55,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPatch("{id}/toggle")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             var result = await _service.ToggleStatusAsync(id);
@@ -58,6 +63,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);

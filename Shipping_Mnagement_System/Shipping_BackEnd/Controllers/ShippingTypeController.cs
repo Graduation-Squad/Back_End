@@ -10,7 +10,6 @@ namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
 
     public class ShippingTypeController : ControllerBase
     {
@@ -23,6 +22,7 @@ namespace Shipping_APIs.Controllers
 
         // GET: api/ShippingType
         [HttpGet]
+        [Authorize(Roles = "Admin,Merchant")]
         public async Task<ActionResult<IEnumerable<ShippingType>>> GetAll([FromQuery] string search = "", [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var shippingTypes = await _shippingTypeService.GetAllAsync(search, page, pageSize);
@@ -31,6 +31,7 @@ namespace Shipping_APIs.Controllers
 
         // GET: api/ShippingType/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Merchant")]
         public async Task<ActionResult<ShippingType>> GetById(int id)
         {
             var shippingType = await _shippingTypeService.GetByIdAsync(id);
@@ -43,6 +44,7 @@ namespace Shipping_APIs.Controllers
 
         // POST: api/ShippingType
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] ShippingType shippingType)
         {
             if (shippingType == null)
@@ -56,6 +58,7 @@ namespace Shipping_APIs.Controllers
 
         // PUT: api/ShippingType/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] ShippingType shippingType)
         {
             if (shippingType == null || id != shippingType.Id)
@@ -75,6 +78,7 @@ namespace Shipping_APIs.Controllers
 
         // DELETE: api/ShippingType/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var shippingType = await _shippingTypeService.GetByIdAsync(id);
@@ -89,6 +93,7 @@ namespace Shipping_APIs.Controllers
 
         // PATCH: api/ShippingType/{id}/toggle-status
         [HttpPatch("{id}/toggle-status")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             var updatedStatus = await _shippingTypeService.ToggleStatusAsync(id);

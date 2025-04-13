@@ -13,55 +13,6 @@ using System.Threading.Tasks;
 
 namespace Shipping.Service
 {
-    //public class OrderService : IOrderService
-    //{
-    //    private readonly IUnitOfWork _unitOfWork;
-
-    //    public OrderService(IUnitOfWork unitOfWork)
-    //    {
-    //        _unitOfWork = unitOfWork;
-    //    }
-    //    public Task AssignOrderToDeliveryManAsync(int orderId, int deliveryManId)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<Order> CreateOrderAsync(OrderCreateDto orderCreateDto)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<Order> GetOrderByIdAsync(int id)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public async Task<IReadOnlyList<Order>> GetOrdersAsync(OrderParameters orderParameters)
-    //    {
-    //        var spec = new OrderSpecifications(orderParameters);
-    //        return await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(spec);
-    //    }
-
-    //    public Task<IReadOnlyList<Order>> GetOrdersByDeliveryManAsync(int deliveryManId, OrderParameters orderParameters)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task<IReadOnlyList<Order>> GetOrdersByMerchantAsync(int merchantId, OrderParameters orderParameters)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task UpdateOrderAsync(int id, OrderUpdateDto orderUpdateDto)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public Task UpdateOrderStatusAsync(int id, OrderStatusUpdateDto statusUpdateDto)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 
     public class OrderService : IOrderService
     {
@@ -125,8 +76,14 @@ namespace Shipping.Service
         public async Task<Order> GetOrderByIdAsync(int id)
         {
             var spec = new OrderSpecifications(id);
-            return await _unitOfWork.Repository<Order>().GetWithSpecAsync(spec);
+            var order = await _unitOfWork.Repository<Order>().GetWithSpecAsync(spec);
+
+            if (order == null)
+                throw new Exception($"Order with ID {id} not found.");
+
+            return order;
         }
+
 
         public async Task UpdateOrderAsync(int id, OrderUpdateDto dto)
         {
@@ -228,6 +185,30 @@ namespace Shipping.Service
                 return baseWeightPrice + additionalCost + shippingTypeCost + villageExtra;
             }
         }
+
+        public async Task<Merchant> GetMerchantByEmailAsync(string email)
+        {
+            var merchant = await _unitOfWork.Repository<Merchant>()
+                .SingleOrDefaultAsync(m => m.AppUser.Email == email);
+
+            if (merchant == null)
+                throw new Exception($"Merchant with email {email} not found.");
+
+            return merchant;
+        }
+
+        public async Task<DeliveryMan> GetDeliveryManByEmailAsync(string email)
+        {
+            var deliveryMan = await _unitOfWork.Repository<DeliveryMan>()
+                .SingleOrDefaultAsync(d => d.AppUser.Email == email);
+
+            if (deliveryMan == null)
+                throw new Exception($"DeliveryMan with email {email} not found.");
+
+            return deliveryMan;
+        }
+
+
 
     }
 

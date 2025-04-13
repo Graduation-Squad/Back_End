@@ -9,7 +9,6 @@ namespace Shipping_APIs.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class RejectionReasonController : ControllerBase
     {
         private readonly IRejectionReasonService _service;
@@ -20,17 +19,21 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,DeliveryMan")]
         public async Task<IActionResult> GetAll() =>
             Ok(await _service.GetAllAsync());
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,DeliveryMan")]
         public async Task<IActionResult> Get(int id)
         {
             var reason = await _service.GetByIdAsync(id);
             return reason == null ? NotFound() : Ok(reason);
         }
+        
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(RejectionReason reason)
         {
             var created = await _service.CreateAsync(reason);
@@ -38,6 +41,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, RejectionReason updated)
         {
             try
@@ -52,6 +56,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPatch("{id}/toggle")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             var result = await _service.ToggleStatusAsync(id);
@@ -59,6 +64,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteAsync(id);
@@ -66,6 +72,7 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpGet("type/{type}")]
+        [Authorize(Roles = "Admin,DeliveryMan")]
         public async Task<IActionResult> GetByType(RejectionReasonType type)
         {
             var reasons = await _service.GetByTypeAsync(type);
