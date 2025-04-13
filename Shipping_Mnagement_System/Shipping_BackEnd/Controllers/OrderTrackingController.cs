@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Core.Services.Contracts;
 using Shipping.Models;
+using Shipping.Service;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -24,15 +25,23 @@ namespace Shipping_APIs.Controllers
         [HttpGet]
         public async Task<IActionResult> GetHistory(int orderId)
         {
-            var result = await _service.GetTrackingHistoryAsync(orderId);
-            if (result == null || result.Count == 0)
+            try
             {
-                return NotFound($"No tracking history found for Order ID: {orderId}");
+                var result = await _service.GetTrackingHistoryAsync(orderId, User);
+                return Ok(result);
             }
-            return Ok(result);
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        
+
+
         [HttpPost]
         [Authorize(Roles = "Admin,Employee")]  
         public async Task<IActionResult> AddTracking(int orderId, CreateOrderTrackingDto dto)

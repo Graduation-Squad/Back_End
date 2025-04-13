@@ -97,6 +97,41 @@ namespace Shipping_APIs.Controllers
             var orders = await _orderService.GetOrdersByDeliveryManAsync(id, parameters);
             return Ok(_mapper.Map<IReadOnlyList<OrderDto>>(orders));
         }
+
+        [HttpGet("my-orders")]
+        [Authorize(Roles = "Merchant,DeliveryMan")]
+        public async Task<IActionResult> GetMyOrders([FromQuery] OrderParameters parameters)
+        {
+            var user = _httpContextAccessor.HttpContext.User;
+
+            var userEmail = user?.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            var userRole = user?.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+            if (string.IsNullOrEmpty(userEmail) || string.IsNullOrEmpty(userRole))
+                return Unauthorized("Invalid token.");
+
+            if (userRole == "Merchant")
+            {
+                var merchant = await _orderService.GetMerchantByEmailAsync(userEmail);
+                if (merchant == null)
+                    return NotFound("Merchant not found.");
+
+                var orders = await _orderService.GetOrdersByMerchantAsync(merchant.Id, parameters);
+                return Ok(_mapper.Map<IReadOnlyList<OrderDto>>(orders));
+            }
+            else if (userRole == "DeliveryMan")
+            {
+                var deliveryMan = await _orderService.GetDeliveryManByEmailAsync(userEmail);
+                if (deliveryMan == null)
+                    return NotFound("Delivery man not found.");
+
+                var orders = await _orderService.GetOrdersByDeliveryManAsync(deliveryMan.Id, parameters);
+                return Ok(_mapper.Map<IReadOnlyList<OrderDto>>(orders));
+            }
+
+            return Forbid("Only Merchant or DeliveryMan can access this endpoint.");
+        }
+
     }
 
 }
