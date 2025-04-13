@@ -34,14 +34,17 @@ namespace Shipping.Repository.Data.Identity
             // 2. Seed permissions
             await SeedPermissionsAsync(unitOfWork);
 
-            // 3. Create admin user group with all permissions
-            var adminGroup = await EnsureAdminGroupExists(unitOfWork);
+            // 3. Create default user groups with their permissions
+            await EnsureDefaultUserGroupsExist(unitOfWork);
 
-            // 4. Create initial users
+            // 4. Create initial admin user
+            var adminGroup = await unitOfWork.Repository<UserGroup>()
+                .GetWithSpecAsync(new UserGroupByNameSpec("Administrators"));
+
             await CreateUserIfNotExists(
                 userManager, emailService, context, unitOfWork,
                 "em468001@gmail.com", "Admin@123", "System Admin",
-                UserType.Admin, "Admin", "Admin Address", "01000000000", adminGroup.Id);
+                UserType.Admin, "Admin", "Admin Address", "01000000000", adminGroup?.Id);
         }
 
         private static async Task SeedPermissionsAsync(IUnitOfWork unitOfWork)
@@ -78,12 +81,10 @@ namespace Shipping.Repository.Data.Identity
                 new Permission() { Name = Permissions.Locations.ManageAreas, Description = "Manage areas", Module = "Locations" },
                 
                 // Dashboard Permissions
-                new Permission() { Name = Permissions.Dashboard.ViewMerchant, Description = "View merchants", Module = "Dashboard" },
-                new Permission() { Name = Permissions.Dashboard.ViewEmployee, Description = "View employees", Module = "Dashboard" },
-                new Permission() { Name = Permissions.Dashboard.ViewAdmin, Description = "View admins", Module = "Dashboard" }
-
-        };
-
+                new Permission() { Name = Permissions.Dashboard.ViewMerchant, Description = "View merchant dashboard", Module = "Dashboard" },
+                new Permission() { Name = Permissions.Dashboard.ViewEmployee, Description = "View employee dashboard", Module = "Dashboard" },
+                new Permission() { Name = Permissions.Dashboard.ViewAdmin, Description = "View admin dashboard", Module = "Dashboard" }
+            };
 
             foreach (var permission in permissionsToAdd)
             {
@@ -98,30 +99,58 @@ namespace Shipping.Repository.Data.Identity
             await unitOfWork.CompleteAsync();
         }
 
-        private static async Task<UserGroup> EnsureAdminGroupExists(IUnitOfWork unitOfWork)
+        private static async Task EnsureDefaultUserGroupsExist(IUnitOfWork unitOfWork)
         {
-            var adminGroup = await unitOfWork.Repository<UserGroup>()
-                .GetWithSpecAsync(new UserGroupByNameSpec("Administrators"));
+            // Get all permissions once
+            var allPermissions = await unitOfWork.Repository<Permission>().GetAllAsync();
 
-            if (adminGroup == null)
+            // Administrators group (all permissions)
+            await EnsureUserGroupExists(unitOfWork, "Administrators", allPermissions);
+
+            // Merchants group
+            var merchantPermissions = allPermissions.Where(p =>
+                p.Name == Permissions.Dashboard.ViewMerchant ||
+                p.Name == Permissions.Orders.Create ||
+                p.Name == Permissions.Orders.View).ToList();
+            await EnsureUserGroupExists(unitOfWork, "Merchants", merchantPermissions);
+
+            // Employees group
+            var employeePermissions = allPermissions.Where(p =>
+                p.Name == Permissions.Dashboard.ViewEmployee ||
+                p.Name == Permissions.Orders.View ||
+                p.Name == Permissions.Orders.UpdateStatus ||
+                p.Name == Permissions.Orders.Assign).ToList();
+            await EnsureUserGroupExists(unitOfWork, "Employees", employeePermissions);
+
+            // Delivery Personnel group
+            var deliveryPermissions = allPermissions.Where(p =>
+                p.Name == Permissions.Orders.View ||
+                p.Name == Permissions.Orders.UpdateStatus).ToList();
+            await EnsureUserGroupExists(unitOfWork, "Delivery Personnel", deliveryPermissions);
+        }
+
+        private static async Task EnsureUserGroupExists(
+            IUnitOfWork unitOfWork,
+            string name,
+            System.Collections.Generic.IEnumerable<Permission> permissions)
+        {
+            var existingGroup = await unitOfWork.Repository<UserGroup>()
+                .GetWithSpecAsync(new UserGroupByNameSpec(name));
+
+            if (existingGroup == null)
             {
-                var allPermissions = await unitOfWork.Repository<Permission>()
-                    .GetAllAsync();
-
-                adminGroup = new UserGroup
+                var newGroup = new UserGroup
                 {
-                    Name = "Administrators",
-                    UserGroupPermissions = allPermissions.Select(p => new UserGroupPermission
+                    Name = name,
+                    UserGroupPermissions = permissions.Select(p => new UserGroupPermission
                     {
                         PermissionId = p.Id
                     }).ToList()
                 };
 
-                await unitOfWork.Repository<UserGroup>().AddAsync(adminGroup);
+                await unitOfWork.Repository<UserGroup>().AddAsync(newGroup);
                 await unitOfWork.CompleteAsync();
             }
-
-            return adminGroup;
         }
 
         private static async Task CreateUserIfNotExists(

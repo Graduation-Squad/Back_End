@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shipping.Repository.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shipping.Service
 {
@@ -63,7 +64,11 @@ namespace Shipping.Service
                 PhoneNumber = dto.PhoneNumber,
                 EmailConfirmed = true,
                 UserType = UserType.Merchant,
-                Address = dto.Address
+                Address = dto.Address,
+                UserGroupId = await _context.UserGroups
+                    .Where(ug => ug.Name == "Merchants")
+                    .Select(ug => ug.Id)
+                    .FirstOrDefaultAsync()
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -109,7 +114,11 @@ namespace Shipping.Service
                 PhoneNumber = dto.PhoneNumber,
                 EmailConfirmed = true,
                 UserType = UserType.DeliveryAgent,
-                Address = dto.Address
+                Address = dto.Address,
+                UserGroupId = await _context.UserGroups
+                    .Where(ug => ug.Name == "Delivery Personnel")
+                    .Select(ug => ug.Id)
+                    .FirstOrDefaultAsync()
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
@@ -159,7 +168,11 @@ namespace Shipping.Service
                 PhoneNumber = dto.PhoneNumber,
                 EmailConfirmed = true,
                 UserType = UserType.Employee,
-                Address = dto.Address
+                Address = dto.Address,
+                UserGroupId = await _context.UserGroups
+                    .Where(ug => ug.Name == "Employees")
+                    .Select(ug => ug.Id)
+                    .FirstOrDefaultAsync()
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
