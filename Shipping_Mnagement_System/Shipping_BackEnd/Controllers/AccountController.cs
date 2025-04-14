@@ -46,20 +46,29 @@ namespace Shipping_APIs.Controllers
         {
             try
             {
-                var token = await _userService.LoginAsync(model);
+                var mytoken = await _userService.LoginAsync(model);
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 var roles = await _userManager.GetRolesAsync(user);
 
                 return Ok(new
                 {
-                    Token = token,
+                    //Token = token,
                     User = new
                     {
-                        Id = user.Id,
-                        Email = user.Email,
-                        UserName = user.UserName,
-                        FullName = user.FullName,
-                        RoleId = roles.FirstOrDefault() // or whatever identifies the role
+                        //Id = user.Id,
+                        //Email = user.Email,
+                        //UserName = user.UserName,
+                        //FullName = user.FullName,
+                        //RoleId = roles.FirstOrDefault() // or whatever identifies the role
+                        userID = user.Id,
+                        name = user.FullName,
+                        email = user.Email,
+                        role = user.UserType,
+                        roleId = 1,
+                        token = mytoken,
+                        userName = user.UserName,
+                        status = user.IsActive
+
                     }
                 });
             }
