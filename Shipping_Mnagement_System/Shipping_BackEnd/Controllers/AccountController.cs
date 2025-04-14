@@ -63,7 +63,7 @@ namespace Shipping_APIs.Controllers
                         userID = user.Id,
                         name = user.FullName,
                         email = user.Email,
-                        role = user.UserType,
+                        role = roles.FirstOrDefault(),
                         roleId = 1,
                         token = mytoken,
                         userName = user.UserName,
