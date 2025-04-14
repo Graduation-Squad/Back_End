@@ -24,6 +24,18 @@ namespace Shipping_APIs
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            //add CORS services
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                    });
+            });
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAngularApp",
@@ -208,6 +220,10 @@ namespace Shipping_APIs
 
 
             var app = builder.Build();
+
+            //use CORS
+            app.UseCors("AllowAllOrigins");
+
 
             #region Database Migration & Seeding
             using var scope = app.Services.CreateScope();
