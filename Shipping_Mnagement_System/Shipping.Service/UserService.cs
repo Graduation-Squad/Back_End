@@ -118,35 +118,45 @@ namespace Shipping.Service
         }
         public async Task<string> LoginAsync(LoginModel model)
         {
-            Console.WriteLine($"Login attempt for email: {model.Email}"); // Debug
+            Console.WriteLine($"Login attempt for email: {model.Email}");
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                Console.WriteLine("User not found"); // Debug
+                Console.WriteLine("User not found");
                 throw new UnauthorizedAccessException("Invalid email or password");
             }
 
             bool isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (!isPasswordValid)
             {
-                Console.WriteLine("Invalid password"); // Debug
+                Console.WriteLine("Invalid password");
                 throw new UnauthorizedAccessException("Invalid email or password");
             }
-            Console.WriteLine($"User found: {user.Email}"); // Debug
+
+            Console.WriteLine($"User found: {user.Email}");
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            var claims = new List<Claim>
-            {
-               new Claim(ClaimTypes.NameIdentifier, user.Id),
-               new Claim(ClaimTypes.Email, user.Email),
-               new Claim(ClaimTypes.Name, user.UserName),
-               new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
+            // Debug: Log the roles
+            Console.WriteLine($"User roles: {string.Join(", ", userRoles)}");
 
-            
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+    };
+
+            // Add all roles to claims
             foreach (var role in userRoles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            // Add a specific claim for the primary role if needed
+            if (userRoles.Any())
+            {
+                claims.Add(new Claim("PrimaryRole", userRoles.First()));
             }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]));
