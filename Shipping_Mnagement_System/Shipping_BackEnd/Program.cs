@@ -36,18 +36,6 @@ namespace Shipping_APIs
                     });
             });
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAngularApp",
-                    policy =>
-                    {
-                        policy.WithOrigins("http://localhost:4200")
-                              .AllowAnyHeader()
-                              .AllowAnyMethod()
-                              .AllowCredentials(); // if you're using cookies or auth
-                    });
-            });
-
             builder.Services.AddHttpContextAccessor();
 
             #region Configure Services
@@ -269,7 +257,6 @@ namespace Shipping_APIs
 
             app.UseStatusCodePagesWithRedirects("/errors/{0}");
             //app.UseStatusCodePages();
-            app.UseCors("AllowAngularApp");
             app.UseHttpsRedirection(); 
             app.UseAuthentication();
             app.UseMiddleware<PermissionMiddleware>();
