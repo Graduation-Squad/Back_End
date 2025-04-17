@@ -27,8 +27,8 @@ namespace Shipping_APIs.Controllers
         }
 
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")]  
-        public async Task<ActionResult> Register(RegisterRequest model)
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<RegisterResponse>> Register(RegisterRequest model)
         {
             try
             {
@@ -46,30 +46,13 @@ namespace Shipping_APIs.Controllers
         {
             try
             {
-                var mytoken = await _userService.LoginAsync(model);
+                var token = await _userService.LoginAsync(model);
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 var roles = await _userManager.GetRolesAsync(user);
 
                 return Ok(new
                 {
-                    //Token = token,
-                    User = new
-                    {
-                        //Id = user.Id,
-                        //Email = user.Email,
-                        //UserName = user.UserName,
-                        //FullName = user.FullName,
-                        //RoleId = roles.FirstOrDefault() // or whatever identifies the role
-                        userID = user.Id,
-                        name = user.FullName,
-                        email = user.Email,
-                        role = roles.FirstOrDefault(),
-                        roleId = 1,
-                        token = mytoken,
-                        userName = user.UserName,
-                        status = user.IsActive
-
-                    }
+                    Token = token,
                 });
             }
             catch (UnauthorizedAccessException ex)

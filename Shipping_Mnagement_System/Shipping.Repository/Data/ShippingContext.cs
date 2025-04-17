@@ -57,6 +57,7 @@ namespace Shipping.Repository.Data
         public DbSet<UserBranch> UserBranches { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<WeightSetting> WeightSettings { get; set; }
+        public DbSet<VillageDeliveryPrice> villageDeliveryPrices { get; set; }
 
 
 

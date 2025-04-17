@@ -12,6 +12,7 @@ namespace Shipping.Core.DomainModels
         public string Name { get; set; }
         public bool IsActive { get; set; } = true;
 
+        public decimal DefaultShippingCost { get; set; } = 0;
         public int GovernorateId { get; set; }
         public Governorate? Governorate { get; set; }
 
