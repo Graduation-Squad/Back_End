@@ -44,6 +44,7 @@ namespace Shipping.Service
             decimal shippingCost = await calculateShippingCost(
                 dto.TotalWeight,
                 dto.GovernorateId,
+                dto.CityId,
                 dto.DeliveryOptionId,
                 dto.IsVillageDelivery
             );
@@ -101,7 +102,7 @@ namespace Shipping.Service
 
            if(dto.TotalWeight.HasValue || dto.DeliveryOptionId.HasValue || dto.GovernorateId.HasValue || dto.IsVillageDelivery.HasValue)
            {
-                decimal shippingCost = await calculateShippingCost(order.TotalWeight, order.GovernorateId, order.ShippingTypeId, order.IsVillageDelivery);
+                decimal shippingCost = await calculateShippingCost(order.TotalWeight, order.GovernorateId, order.CityId, order.ShippingTypeId, order.IsVillageDelivery);
                 order.ShippingCost = shippingCost;
                 order.CODAmount = shippingCost;
            }
@@ -153,14 +154,18 @@ namespace Shipping.Service
             return await _unitOfWork.Repository<Order>().GetAllWithSpecAsync(spec);
         }
 
-        public async Task<decimal> calculateShippingCost(decimal weight, int governateId, int shippingTypeId, bool IsVillageDelivery)
+        public async Task<decimal> calculateShippingCost(decimal weight, int governateId, int cityId, int shippingTypeId, bool IsVillageDelivery)
         {
-            decimal villageExtra = IsVillageDelivery ? 10 : 0;
-
             var weightSetting = await _unitOfWork.Repository<WeightSetting>().GetByIdAsync(governateId);
             if (weightSetting == null)
             {
                 throw new Exception($"Weight setting for governorate ID {governateId} not found.");
+            }
+
+            var city = await _unitOfWork.Repository<City>().GetByIdAsync(cityId);
+            if (city == null)
+            {
+                throw new Exception($"City with ID {cityId} not found.");
             }
 
             var shippingType = await _unitOfWork.Repository<ShippingType>().GetByIdAsync(shippingTypeId);
@@ -168,21 +173,23 @@ namespace Shipping.Service
             {
                 throw new Exception("Shipping type not found.");
             }
-            var shippingTypeCost = shippingType.AdditionalCost;
 
+            decimal villageExtra = (IsVillageDelivery is true) ? (await _unitOfWork.Repository<VillageDeliveryPrice>().GetAllAsync()).FirstOrDefault().Price : 0;
+            decimal shippingTypeCost = shippingType.AdditionalCost;
             decimal baseWeight = weightSetting.BaseWeight;
-            decimal baseWeightPrice = weightSetting.BaseWeightPrice;
-            decimal additionalWeightPrice = weightSetting.AdditionalWeightPrice;
+            decimal baseWeightCost = weightSetting.BaseWeightPrice;
+            decimal additionalWeightCost = weightSetting.AdditionalWeightPrice;
+            decimal deliveryToCityCost = city.DefaultShippingCost;
 
             if (weight <= baseWeight)
             {
-                return baseWeightPrice + shippingTypeCost + villageExtra;
+                return baseWeightCost + deliveryToCityCost + shippingTypeCost + villageExtra;
             }
             else
             {
                 decimal additionalWeight = weight - baseWeight;
-                decimal additionalCost = Math.Ceiling(additionalWeight) * additionalWeightPrice;
-                return baseWeightPrice + additionalCost + shippingTypeCost + villageExtra;
+                decimal additionalCost = Math.Ceiling(additionalWeight) * additionalWeightCost;
+                return baseWeightCost + additionalCost + deliveryToCityCost + shippingTypeCost + villageExtra;
             }
         }
 
