@@ -175,6 +175,23 @@ namespace Shipping.Service
 
             return tokenHandler.WriteToken(token);
         }
+
+
+        public async Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) throw new Exception("User not found.");
+
+            var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception(errors);
+            }
+
+            return true;
+        }
+
         public async Task<bool> HasPermissionAsync(string userId, string permissionName)
         {
             var user = await _unitOfWork.Repository<AppUser>()
