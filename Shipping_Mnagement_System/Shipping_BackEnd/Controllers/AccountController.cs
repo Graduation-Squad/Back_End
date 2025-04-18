@@ -66,6 +66,30 @@ namespace Shipping_APIs.Controllers
         }
 
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            try
+            {
+                await _userService.ChangePasswordAsync(user.Id, model.CurrentPassword, model.NewPassword);
+                return Ok(new { message = "Password changed successfully." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
+        }
+
+
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            // Client should delete token locally
+            return Ok(new { message = "Logged out successfully." });
+        }
 
     }
 }
