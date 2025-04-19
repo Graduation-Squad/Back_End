@@ -8,6 +8,7 @@ using Shipping.Core.Services.Contracts;
 using Shipping.Core.Specification;
 using Shipping.Models;
 using Shipping_APIs.Attributes;
+using Shipping_APIs.Errors;
 
 namespace Shipping_APIs.Controllers
 {
@@ -39,13 +40,20 @@ namespace Shipping_APIs.Controllers
         [Authorize(Roles = "Merchant")]
         public async Task<ActionResult<OrderDto>> CreateOrder([FromBody] OrderCreateDto dto)
         {
-            var userEmail = _httpContextAccessor.HttpContext.User?.Identity?.Name;
+            try
+            {
+                var userEmail = _httpContextAccessor.HttpContext.User?.Identity?.Name;
 
-            if (string.IsNullOrEmpty(userEmail))
-                return Unauthorized("Invalid token.");
+                if (string.IsNullOrEmpty(userEmail))
+                    return Unauthorized("Invalid token.");
 
-            var order = await _orderService.CreateOrderAsync(dto, userEmail);
-            return Ok(_mapper.Map<OrderDto>(order));
+                var order = await _orderService.CreateOrderAsync(dto, userEmail);
+                return Ok(_mapper.Map<OrderDto>(order));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
         }
 
 
@@ -70,8 +78,15 @@ namespace Shipping_APIs.Controllers
         [Permission(Permissions.Orders.UpdateStatus)]
         public async Task<IActionResult> UpdateStatus(int id, OrderStatusUpdateDto dto)
         {
-            await _orderService.UpdateOrderStatusAsync(id, dto);
-            return NoContent();
+            try
+            {
+                await _orderService.UpdateOrderStatusAsync(id, dto);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiErrorResponse(400, ex.Message));
+            }
         }
 
         [HttpPost("{id}/assign")]

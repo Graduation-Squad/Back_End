@@ -17,10 +17,12 @@ namespace Shipping.Service
     public class OrderService : IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IVillageDeliveryService _villageDeliveryService;
 
-        public OrderService(IUnitOfWork unitOfWork)
+        public OrderService(IUnitOfWork unitOfWork, IVillageDeliveryService villageDeliveryService)
         {
             _unitOfWork = unitOfWork;
+            _villageDeliveryService = villageDeliveryService;
         }
 
         public async Task<IReadOnlyList<Order>> GetOrdersAsync(OrderParameters orderParameters)
@@ -174,7 +176,7 @@ namespace Shipping.Service
                 throw new Exception("Shipping type not found.");
             }
 
-            decimal villageExtra = (IsVillageDelivery is true) ? (await _unitOfWork.Repository<VillageDeliveryPrice>().GetAllAsync()).FirstOrDefault().Price : 0;
+            decimal villageExtra = (IsVillageDelivery is true) ? (decimal) await _villageDeliveryService.GetVillageDeliveryCostAsync() : 0;
             decimal shippingTypeCost = shippingType.AdditionalCost;
             decimal baseWeight = weightSetting.BaseWeight;
             decimal baseWeightCost = weightSetting.BaseWeightPrice;
