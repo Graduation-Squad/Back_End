@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Shipping.Core.Services.Contracts
+{
+    public interface IVillageDeliveryService
+    {
+        Task<Decimal?> GetVillageDeliveryCostAsync();
+        Task UpdateVillageDeliveryCostAsync(decimal amount);
+    }
+}

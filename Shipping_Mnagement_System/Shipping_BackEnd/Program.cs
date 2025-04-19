@@ -131,6 +131,7 @@ namespace Shipping_APIs
             builder.Services.AddScoped<IShippingTypeService, ShippingTypeService>();
             builder.Services.AddScoped<IRejectionReasonService, RejectionReasonService>();
             builder.Services.AddScoped<IWeightSettingService, WeightSettingService>();
+            builder.Services.AddScoped<IVillageDeliveryService, VillageDeliveryService>();
 
 
             // ? AutoMapper Configuration
